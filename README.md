@@ -7,6 +7,7 @@
 - `referencias/`: taxonomia de orgânicos e agroecologia e dicionário de 62 produtos
 - `scripts/`: o passo a passo que gera os dados (Python)
 - `dados/`: tabelas geradas pelos scripts (conteúdos classificados, pesquisadores, produtores por município, produção × ciência)
+- `cadastro/`: formulário Google (script que cria formulário e planilha) para feiras e pontos de venda, que alimenta a camada "Onde comprar"
 - `validacao/`: planilha de validação por amostra, para revisão dos especialistas
 
 Tudo roda no navegador, sem servidor e sem cadastro. O assistente "Pergunte" é um código aberto em JavaScript: ele reconhece produto, lugar, tema, tipo e período na pergunta e responde com os mesmos dados da página, sem enviar nada para fora.

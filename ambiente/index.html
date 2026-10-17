@@ -182,6 +182,7 @@ td.num{text-align:right;font-family:var(--f-mono);font-size:13px}
             <button aria-pressed="true" data-v="conteudos">Conteúdos da Embrapa</button>
             <button aria-pressed="false" data-v="produtores">Produtores orgânicos</button>
             <button aria-pressed="false" data-v="ocs">Venda direta (OCS)</button>
+            <button aria-pressed="false" data-v="pontos">Onde comprar</button>
           </div>
           <div class="seg" id="m-onde" title="Onde marcar cada conteúdo">
             <button aria-pressed="true" data-v="citado">Lugar citado</button>
@@ -336,6 +337,34 @@ function itemsF(skip){
 }
 // produtores: seguem só os filtros de lugar (bioma, região, estado), produto e busca por município
 const nProd = (p, k = F.produto) => k === "" || k == null ? p.cn + p.sg : (p.pc[k] || 0);
+// onde comprar: feiras e pontos de venda do cadastro próprio (formulário Google; só entram os aprovados pela equipe)
+// ambiente/cadastro.json traz o link do formulário e o CSV publicado da aba "Publicar" da planilha
+let PONTOS = null, CAD = {formulario:"", csv:""};
+const chaveMun = (m, uf) => (m||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toUpperCase().replace(/[^A-Z ]/g," ").replace(/\s+/g," ").trim() + "|" + (uf||"").trim().toUpperCase();
+function coordDoLink(u){
+  const m = (u||"").match(/@(-?\d+\.\d+),(-?\d+\.\d+)/) || (u||"").match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/) || (u||"").match(/[?&](?:q|ll|query)=(-?\d+\.\d+),\s*(-?\d+\.\d+)/);
+  return m ? [+m[1], +m[2]] : null;
+}
+async function carregarPontos(){
+  if (PONTOS) return PONTOS;
+  try { CAD = await fetch("cadastro.json").then(r=>r.json()); } catch(e){}
+  if (!CAD.csv){ PONTOS = []; return PONTOS; }
+  try {
+    const [txt, mun] = await Promise.all([fetch(CAD.csv).then(r=>r.text()), fetch("municipios.json").then(r=>r.json())]);
+    // colunas da aba "Publicar": nome, tipo, UF, município, endereço, link do Maps, dias, horário, produtos, garantia, entrega, contato, data
+    PONTOS = d3.csvParseRows(txt).slice(1).filter(r => r[0]).map(r => {
+      const [nome, tipo, uf, municipio, endereco, link, dias, horario, produtos, garantia, entrega, contato] = r.map(x => (x||"").trim());
+      const mm = mun[chaveMun(municipio, uf)]; const exato = coordDoLink(link);
+      if (!mm && !exato) return null;
+      return {nome, tipo, uf, municipio: mm ? mm[2] : municipio+"-"+uf, endereco, link, dias, horario, produtos, garantia, entrega, contato,
+              ll: exato || [mm[0], mm[1]], exato: !!exato, b: mm ? mm[3] : "", rg: mm ? mm[4] : (D.ufs[uf]||[])[1]};
+    }).filter(Boolean);
+  } catch(e){ console.error(e); PONTOS = []; }
+  return PONTOS;
+}
+const pontosF = () => (PONTOS||[]).filter(p => (!F.uf || p.uf === F.uf) && (!F.regiao || p.rg === F.regiao) && (!F.bioma || p.b === F.bioma) && (!F.q || norm(p.nome+" "+p.municipio+" "+p.produtos+" "+p.tipo).includes(norm(F.q))));
+const linkSeguro = u => /^https:\/\//i.test(u||"") ? u : "";
+
 // venda direta: produtores em OCS, o grupo que a lei autoriza a vender direto ao consumidor (feiras, entregas, na propriedade)
 const nOcs = (p, k = F.produto) => k === "" || k == null ? p.oc : (p.po[k] || 0);
 function prodF(k = F.produto){
@@ -370,7 +399,7 @@ function initMap(est, bio){
 let ufCount = {};
 function ufTip(uf){
   const [nome] = D.ufs[uf]; const v = ufCount[uf]||0;
-  return `<b>${nome}</b><br>${fmt(v)} ${view.camada==="conteudos" ? "conteúdos" : view.camada==="ocs" ? "produtores em venda direta" : "produtores"}<br><small>Clique para filtrar</small>`;
+  return `<b>${nome}</b><br>${fmt(v)} ${view.camada==="conteudos" ? "conteúdos" : view.camada==="ocs" ? "produtores em venda direta" : view.camada==="pontos" ? "pontos de venda" : "produtores"}<br><small>Clique para filtrar</small>`;
 }
 function tip(e, html){
   const t = $("#tip"); if (!e){ t.hidden = true; return; }
@@ -387,28 +416,38 @@ function drawMap(items){
       ufs.forEach(u => ufCount[u] = (ufCount[u]||0)+1);
       locs.forEach(m => pts[m] = (pts[m]||0)+1);
     }
+  } else if (view.camada === "pontos"){
+    if (!PONTOS){ carregarPontos().then(()=>{ if (view.camada === "pontos") render(); }); }
+    pontosF().forEach((p, k) => { ufCount[p.uf] = (ufCount[p.uf]||0)+1; pts["ponto"+k] = {n:1, pt:p}; });
   } else if (view.camada === "ocs"){
     for (const p of prodF()){ const n = nOcs(p); if (!n) continue; ufCount[p.uf] = (ufCount[p.uf]||0)+n; pts[p.id] = {n, p}; }
   } else {
     for (const p of prodF()){ const n = nProd(p); ufCount[p.uf] = (ufCount[p.uf]||0)+n; pts[p.id] = {n, p}; }
   }
-  const ocsV = view.camada === "ocs", unid = conteudo ? "conteúdos" : ocsV ? "produtores em venda direta" : "produtores";
+  const ocsV = view.camada === "ocs", ptV = view.camada === "pontos", unid = conteudo ? "conteúdos" : ocsV ? "produtores em venda direta" : ptV ? "pontos de venda" : "produtores";
   const max = d3.max(Object.values(ufCount)) || 1;
   const base = conteudo ? css("--green") : css("--ochre");
   const sc = d3.scaleSqrt().domain([0,max]).range([0.08,0.85]);
   gUf.selectAll("path").attr("fill", d => { const v = ufCount[d.properties.uf]||0; if (view.biomas) return "transparent"; if (!v) return css("--map-empty"); const c = d3.color(base); c.opacity = sc(v); return c+""; })
     .classed("sel", d => d.properties.uf === F.uf);
   gBio.selectAll("path").attr("hidden", view.biomas ? null : true).attr("fill", d=>css(BCOL[d.properties.name_biome])||"none");
-  const arr = Object.entries(pts).map(([id,v]) => { const n = typeof v==="number" ? v : v.n; const ll = typeof v==="number" ? D.mun[id] : [v.p.la, v.p.lo]; return ll ? {id,n,ll,p:v.p} : null; }).filter(Boolean).sort((a,b)=>b.n-a.n);
-  const pm = d3.max(arr, d=>d.n) || 1; const r = d3.scaleSqrt().domain([0,pm]).range([1.5, conteudo ? 14 : 18]);
+  const arr = Object.entries(pts).map(([id,v]) => { const n = typeof v==="number" ? v : v.n; const ll = typeof v==="number" ? D.mun[id] : v.pt ? v.pt.ll : [v.p.la, v.p.lo]; return ll ? {id,n,ll,p:v.p,pt:v.pt} : null; }).filter(Boolean).sort((a,b)=>b.n-a.n);
+  const pm = d3.max(arr, d=>d.n) || 1; const r = d3.scaleSqrt().domain([0,pm]).range(ptV ? [5, 5] : [1.5, conteudo ? 14 : 18]);
   gDot.selectAll("circle").data(arr, d=>d.id).join("circle").attr("class","dot")
     .attr("cx", d=>proj([d.ll[1], d.ll[0]])[0]).attr("cy", d=>proj([d.ll[1], d.ll[0]])[1])
     .attr("r", d=>r(d.n)).attr("data-r", d=>r(d.n))
-    .attr("fill", conteudo ? css("--ink") : css("--ochre")).attr("fill-opacity", .7)
-    .on("mousemove",(e,d)=>tip(e, `<b>${d.id}</b><br>${fmt(d.n)} ${unid}` + (d.p ? (ocsV && d.p.og.length ? `<br><small>${d.p.og.map(esc).join("<br>")}</small>` : `<br>${d.p.pp.replaceAll("-"," ")}`) : "")))
+    .attr("fill", conteudo ? css("--ink") : ptV ? css("--green") : css("--ochre")).attr("fill-opacity", ptV ? .9 : .7)
+    .on("mousemove",(e,d)=>tip(e, d.pt ? fichaPonto(d.pt) : `<b>${d.id}</b><br>${fmt(d.n)} ${unid}` + (d.p ? (ocsV && d.p.og.length ? `<br><small>${d.p.og.map(esc).join("<br>")}</small>` : `<br>${d.p.pp.replaceAll("-"," ")}`) : "")))
     .on("mouseleave",()=>tip())
-    .on("click",(e,d)=>{ if (conteudo){ $("#f-q").value=""; setF({uf:d.id.split("-").pop()}); showTab("conteudos"); } });
+    .on("click",(e,d)=>{ if (d.pt){ const u = linkSeguro(d.pt.link) || `https://www.google.com/maps/search/?api=1&query=${d.pt.ll[0]},${d.pt.ll[1]}`; open(u, "_blank", "noopener"); return; } if (conteudo){ $("#f-q").value=""; setF({uf:d.id.split("-").pop()}); showTab("conteudos"); } });
   const lg = $("#legend");
+  if (ptV && !view.biomas){
+    const n = pontosF().length, cad = CAD.formulario ? `<a href="${esc(linkSeguro(CAD.formulario))}" target="_blank" rel="noopener">Cadastre uma feira ou ponto de venda</a>` : "";
+    lg.innerHTML = PONTOS === null ? `<span>Carregando os pontos de venda…</span>`
+      : !CAD.csv ? `<span>O cadastro de feiras e pontos de venda está sendo preparado.</span><span>Enquanto isso, veja o <a href="https://feirasorganicas.org.br/" target="_blank" rel="noopener">Mapa de Feiras Orgânicas do Idec</a>.</span>`
+      : `<span><i class="sw" style="background:${css("--green")};border-radius:50%"></i>${fmt(n)} ${n===1?"ponto de venda aprovado":"pontos de venda aprovados"} pela equipe. Clique num ponto para abrir no mapa.</span>${cad?`<span>${cad}</span>`:""}<span><small>Pontos sem link do Google Maps ficam no centro do município.</small></span>`;
+    $("#m-onde").hidden = true; return;
+  }
   lg.innerHTML = view.biomas ? BIOMAS.map(b=>`<span><i class="sw" style="background:var(${BCOL[b]})"></i>${b}</span>`).join("")
     : `<span><i class="sw" style="background:${base}"></i>cor do estado: quanto mais forte, mais ${conteudo?"conteúdos":"produtores"}</span><span><i class="sw" style="background:${conteudo?css("--ink"):base};border-radius:50%"></i>círculo: ${conteudo ? (view.onde==="citado"?"município citado no texto":"cidade da Unidade da Embrapa") : ocsV ? "produtores em OCS no município (passe o mouse para ver os grupos)" : "produtores no município"}</span>` + (ocsV ? `<span>OCS são grupos autorizados a vender direto ao consumidor, em feiras, entregas ou na propriedade. O endereço das feiras não está no cadastro. Veja também o <a href="https://feirasorganicas.org.br/" target="_blank" rel="noopener">Mapa de Feiras Orgânicas do Idec</a>.</span>` : "");
   $("#m-onde").hidden = !conteudo;
@@ -686,6 +725,10 @@ function aplicarPerfil(nome){
   setCamada(p.camada || "conteudos");
   setF(Object.fromEntries(ids.map(k=>[k, p.f[k] ?? ""])));
   showTab(p.tab);
+}
+function fichaPonto(p){
+  const l = (r, v) => v ? `<br><small>${r}: ${esc(v)}</small>` : "";
+  return `<b>${esc(p.nome)}</b><br>${esc(p.tipo)} · ${esc(p.municipio)}${l("Endereço", p.endereco)}${l("Dias", [p.dias, p.horario].filter(Boolean).join(", "))}${l("Produtos", p.produtos)}${l("Garantia", p.garantia)}${l("Entrega", p.entrega)}${l("Contato", p.contato)}`;
 }
 function setCamada(v){ view.camada = v; document.querySelectorAll("#m-camada button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.v===v)); }
 
