@@ -181,6 +181,7 @@ td.num{text-align:right;font-family:var(--f-mono);font-size:13px}
           <div class="seg" id="m-camada">
             <button aria-pressed="true" data-v="conteudos">Conteúdos da Embrapa</button>
             <button aria-pressed="false" data-v="produtores">Produtores orgânicos</button>
+            <button aria-pressed="false" data-v="ocs">Venda direta (OCS)</button>
           </div>
           <div class="seg" id="m-onde" title="Onde marcar cada conteúdo">
             <button aria-pressed="true" data-v="citado">Lugar citado</button>
@@ -335,6 +336,8 @@ function itemsF(skip){
 }
 // produtores: seguem só os filtros de lugar (bioma, região, estado), produto e busca por município
 const nProd = (p, k = F.produto) => k === "" || k == null ? p.cn + p.sg : (p.pc[k] || 0);
+// venda direta: produtores em OCS, o grupo que a lei autoriza a vender direto ao consumidor (feiras, entregas, na propriedade)
+const nOcs = (p, k = F.produto) => k === "" || k == null ? p.oc : (p.po[k] || 0);
 function prodF(k = F.produto){
   return D.prod.filter(p => (!F.bioma || p.b === F.bioma) && (!F.regiao || p.rg === F.regiao) && (!F.uf || p.uf === F.uf) && (!F.q || norm(p.id+" "+p.pp).includes(norm(F.q))) && nProd(p, k) > 0);
 }
@@ -367,7 +370,7 @@ function initMap(est, bio){
 let ufCount = {};
 function ufTip(uf){
   const [nome] = D.ufs[uf]; const v = ufCount[uf]||0;
-  return `<b>${nome}</b><br>${fmt(v)} ${view.camada==="conteudos" ? "conteúdos" : "produtores"}<br><small>Clique para filtrar</small>`;
+  return `<b>${nome}</b><br>${fmt(v)} ${view.camada==="conteudos" ? "conteúdos" : view.camada==="ocs" ? "produtores em venda direta" : "produtores"}<br><small>Clique para filtrar</small>`;
 }
 function tip(e, html){
   const t = $("#tip"); if (!e){ t.hidden = true; return; }
@@ -384,9 +387,12 @@ function drawMap(items){
       ufs.forEach(u => ufCount[u] = (ufCount[u]||0)+1);
       locs.forEach(m => pts[m] = (pts[m]||0)+1);
     }
+  } else if (view.camada === "ocs"){
+    for (const p of prodF()){ const n = nOcs(p); if (!n) continue; ufCount[p.uf] = (ufCount[p.uf]||0)+n; pts[p.id] = {n, p}; }
   } else {
     for (const p of prodF()){ const n = nProd(p); ufCount[p.uf] = (ufCount[p.uf]||0)+n; pts[p.id] = {n, p}; }
   }
+  const ocsV = view.camada === "ocs", unid = conteudo ? "conteúdos" : ocsV ? "produtores em venda direta" : "produtores";
   const max = d3.max(Object.values(ufCount)) || 1;
   const base = conteudo ? css("--green") : css("--ochre");
   const sc = d3.scaleSqrt().domain([0,max]).range([0.08,0.85]);
@@ -399,12 +405,12 @@ function drawMap(items){
     .attr("cx", d=>proj([d.ll[1], d.ll[0]])[0]).attr("cy", d=>proj([d.ll[1], d.ll[0]])[1])
     .attr("r", d=>r(d.n)).attr("data-r", d=>r(d.n))
     .attr("fill", conteudo ? css("--ink") : css("--ochre")).attr("fill-opacity", .7)
-    .on("mousemove",(e,d)=>tip(e, `<b>${d.id}</b><br>${fmt(d.n)} ${conteudo ? "conteúdos" : "produtores"}` + (d.p ? `<br>${d.p.pp.replaceAll("-"," ")}` : "")))
+    .on("mousemove",(e,d)=>tip(e, `<b>${d.id}</b><br>${fmt(d.n)} ${unid}` + (d.p ? (ocsV && d.p.og.length ? `<br><small>${d.p.og.map(esc).join("<br>")}</small>` : `<br>${d.p.pp.replaceAll("-"," ")}`) : "")))
     .on("mouseleave",()=>tip())
     .on("click",(e,d)=>{ if (conteudo){ $("#f-q").value=""; setF({uf:d.id.split("-").pop()}); showTab("conteudos"); } });
   const lg = $("#legend");
   lg.innerHTML = view.biomas ? BIOMAS.map(b=>`<span><i class="sw" style="background:var(${BCOL[b]})"></i>${b}</span>`).join("")
-    : `<span><i class="sw" style="background:${base}"></i>cor do estado: quanto mais forte, mais ${conteudo?"conteúdos":"produtores"}</span><span><i class="sw" style="background:${conteudo?css("--ink"):base};border-radius:50%"></i>círculo: ${conteudo ? (view.onde==="citado"?"município citado no texto":"cidade da Unidade da Embrapa") : "produtores no município"}</span>`;
+    : `<span><i class="sw" style="background:${base}"></i>cor do estado: quanto mais forte, mais ${conteudo?"conteúdos":"produtores"}</span><span><i class="sw" style="background:${conteudo?css("--ink"):base};border-radius:50%"></i>círculo: ${conteudo ? (view.onde==="citado"?"município citado no texto":"cidade da Unidade da Embrapa") : ocsV ? "produtores em OCS no município (passe o mouse para ver os grupos)" : "produtores no município"}</span>` + (ocsV ? `<span>OCS são grupos autorizados a vender direto ao consumidor, em feiras, entregas ou na propriedade. O endereço das feiras não está no cadastro. Veja também o <a href="https://feirasorganicas.org.br/" target="_blank" rel="noopener">Mapa de Feiras Orgânicas do Idec</a>.</span>` : "");
   $("#m-onde").hidden = !conteudo;
 }
 

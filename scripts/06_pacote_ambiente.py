@@ -40,8 +40,15 @@ po = po[po.produtos != ""]
 pc = po.groupby(["id_local", "produtos"]).size()
 pc_d = {}
 for (m, k), n in pc.items(): pc_d.setdefault(m, {})[k] = int(n)
+# venda direta (OCS): produtores por produto e grupos de OCS de cada município (nomes de organizações, não de pessoas)
+ocs = po[po.tipo.str.startswith("OCS")]
+po_d = {}
+for (m, k), n in ocs.groupby(["id_local", "produtos"]).size().items(): po_d.setdefault(m, {})[k] = int(n)
+og = pd.read_csv(D + "produtores_organicos.csv", dtype=str)
+og = og[og.id_local.notna() & og.tipo.str.startswith("OCS")]
+og_d = {m: [e.strip().title() for e in g.entidade.value_counts().index[:4]] for m, g in og.groupby("id_local")}
 prod = [{"id": r.id_local, "uf": r.uf, "rg": r.regiao, "b": r.bioma_predominante, "la": round(r.latitude, 3), "lo": round(r.longitude, 3),
-         "cn": int(r.produtores_cnpo), "sg": int(r.produtores_sigorg), "ce": int(r.certificadora), "op": int(r.opac), "oc": int(r.ocs), "pp": r.principais_produtos if isinstance(r.principais_produtos, str) else "", "pc": pc_d.get(r.id_local, {})} for r in pm.itertuples()]
+         "cn": int(r.produtores_cnpo), "sg": int(r.produtores_sigorg), "ce": int(r.certificadora), "op": int(r.opac), "oc": int(r.ocs), "pp": r.principais_produtos if isinstance(r.principais_produtos, str) else "", "pc": pc_d.get(r.id_local, {}), "po": po_d.get(r.id_local, {}), "og": og_d.get(r.id_local, [])} for r in pm.itertuples()]
 ent = pd.read_csv(D + "entidades_organicos.csv")
 ent = [{"f": r.fonte, "tp": r.tipo, "e": r.entidade, "p": int(r.produtores), "m": int(r.municipios), "uf": r.ufs if isinstance(r.ufs, str) else ""} for r in ent.itertuples()]
 mun = pd.read_csv(R + "municipios_ibge_bioma.csv")
