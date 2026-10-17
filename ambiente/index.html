@@ -442,7 +442,7 @@ function drawMap(items){
     .on("click",(e,d)=>{ if (d.pt){ const u = linkSeguro(d.pt.link) || `https://www.google.com/maps/search/?api=1&query=${d.pt.ll[0]},${d.pt.ll[1]}`; open(u, "_blank", "noopener"); return; } if (conteudo){ $("#f-q").value=""; setF({uf:d.id.split("-").pop()}); showTab("conteudos"); } });
   const lg = $("#legend");
   if (ptV && !view.biomas){
-    const n = pontosF().length, cad = CAD.formulario ? `<a href="${esc(linkSeguro(CAD.formulario))}" target="_blank" rel="noopener">Cadastre uma feira ou ponto de venda</a>` : "";
+    const n = pontosF().length, cad = (CAD.campos && CAD.campos.nome) ? `<a href="../cadastro/">Cadastre uma feira ou ponto de venda</a>` : CAD.formulario ? `<a href="${esc(linkSeguro(CAD.formulario))}" target="_blank" rel="noopener">Cadastre uma feira ou ponto de venda</a>` : "";
     lg.innerHTML = PONTOS === null ? `<span>Carregando os pontos de venda…</span>`
       : !CAD.csv ? `<span>Os primeiros pontos de venda aparecem aqui assim que forem aprovados pela equipe.</span>${cad?`<span>${cad}</span>`:""}<span>Veja também o <a href="https://feirasorganicas.org.br/" target="_blank" rel="noopener">Mapa de Feiras Orgânicas do Idec</a>.</span>`
       : `<span><i class="sw" style="background:${css("--green")};border-radius:50%"></i>${fmt(n)} ${n===1?"ponto de venda aprovado":"pontos de venda aprovados"} pela equipe. Clique num ponto para abrir no mapa.</span>${cad?`<span>${cad}</span>`:""}<span><small>Pontos sem link do Google Maps ficam no centro do município.</small></span>`;

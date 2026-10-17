@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Cadastre um ponto de venda</title>
+<meta name="description" content="Cadastre uma feira, grupo de consumo, loja ou outro lugar que vende alimentos orgânicos ou agroecológicos.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Fraunces:ital,opsz,wght@0,9..144,700;1,9..144,500&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: faixa com a foto da capa e o título; abaixo, o formulário em blocos (o lugar, onde fica, quando e o quê, quem cadastra) */
+:root{
+  --bg:#f3f5f0; --surface:#ffffff; --ink:#1d2a22; --muted:#5d6b61; --line:#d6ddd3;
+  --green:#2f6b4f; --green-soft:#d9e8de; --ochre:#b8860b; --ochre-soft:#f3e6c4; --focus:#1f5fbf; --erro:#b42318;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --f-serif:"Fraunces", Georgia, serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121915; --surface:#1a231e; --ink:#e4ebe5; --muted:#9aaa9f; --line:#2e3b33;
+  --green:#7cc39b; --green-soft:#24392d; --ochre:#e0b54a; --ochre-soft:#3a3120; --focus:#8db7ff; --erro:#f97066; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121915; --surface:#1a231e; --ink:#e4ebe5; --muted:#9aaa9f; --line:#2e3b33;
+  --green:#7cc39b; --green-soft:#24392d; --ochre:#e0b54a; --ochre-soft:#3a3120; --focus:#8db7ff; --erro:#f97066; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 var(--f-body)}
+.wrap{max-width:860px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2{margin:0;text-wrap:balance}
+p{margin:0}
+a{color:var(--green)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+[hidden]{display:none!important}
+
+.faixa{position:relative;color:#fff;background:#0c2a14 url("../img/foto_capa.jpg") center 70%/cover no-repeat;isolation:isolate}
+.faixa::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(to bottom, rgb(12 42 20 / .45), rgb(12 42 20 / .92) 85%)}
+.faixa .top{display:flex;justify-content:space-between;gap:12px;padding-block:18px;font-size:15px}
+.faixa .top a{color:#fff;text-decoration:none;font-weight:600}
+.faixa .top span{color:rgb(255 255 255 / .8)}
+.faixa .tit{padding-block:40px 44px}
+.pill{display:inline-block;font-weight:600;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#f6efd8;border:1.5px solid rgb(246 239 216 / .8);padding:7px 16px;border-radius:999px}
+h1{font-family:var(--f-serif);font-size:clamp(34px,5.4vw,56px);font-weight:700;line-height:1.05;margin-top:16px}
+h1 em{display:block;font-weight:500;color:#b9e36a}
+.faixa p.lede{margin-top:14px;max-width:56ch;color:rgb(255 255 255 / .9)}
+.credito{position:absolute;right:max(16px,env(safe-area-inset-right,0px));bottom:8px;font-size:12px;color:rgb(255 255 255 / .7)}
+
+form{padding-block:28px 48px}
+fieldset{border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:22px 22px 8px;margin:0 0 18px;min-width:0}
+legend{font-family:var(--f-display);font-weight:700;font-size:20px;padding:0 8px;margin-left:-8px}
+.passo{font-family:var(--f-mono);font-size:12px;color:var(--green);letter-spacing:.06em;display:block;margin-bottom:2px}
+.campo{margin-bottom:18px;min-width:0}
+.campo > label, .campo > .rot{display:block;font-weight:600;margin-bottom:6px}
+.obr{color:var(--ochre);font-weight:600}
+.ajuda{font-size:14px;color:var(--muted);margin:-2px 0 8px}
+input[type=text],input[type=email],input[type=url],select{width:100%;font:16px var(--f-body);color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:11px 12px}
+input:focus,select:focus{border-color:var(--green);outline:none;box-shadow:0 0 0 3px var(--green-soft)}
+.duas{display:grid;grid-template-columns:120px minmax(0,1fr);gap:12px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips label{position:relative;cursor:pointer}
+.chips input{position:absolute;opacity:0;inset:0;cursor:pointer}
+.chips span{display:inline-block;border:1.5px solid var(--line);background:var(--bg);border-radius:999px;padding:8px 14px;font-size:15px;transition:background .12s,border-color .12s}
+.chips input:checked + span{background:var(--green);border-color:var(--green);color:var(--bg)}
+.chips input:focus-visible + span{outline:2px solid var(--focus);outline-offset:2px}
+.outro{margin-top:10px}
+.aut{display:flex;gap:12px;align-items:flex-start;font-size:16px}
+.aut input{width:20px;height:20px;margin-top:3px;accent-color:var(--green);flex:none}
+.erro{color:var(--erro);font-size:14px;margin-top:6px}
+.campo.invalido input,.campo.invalido select{border-color:var(--erro)}
+.envio{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+button{font:700 18px var(--f-display);background:var(--green);color:var(--bg);border:0;border-radius:999px;padding:15px 30px;cursor:pointer}
+button:hover{filter:brightness(1.08)}
+button[disabled]{opacity:.6;cursor:wait}
+.envio small{color:var(--muted);font-size:14px;max-width:46ch}
+.ok{background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--green);border-radius:16px;padding:24px;margin-block:28px 48px}
+.ok h2{font-family:var(--f-display);font-size:26px}
+.ok p{margin-top:8px;color:var(--muted)}
+.ok .acoes{display:flex;flex-wrap:wrap;gap:16px;margin-top:16px;font-weight:600}
+@media (max-width:560px){.duas{grid-template-columns:minmax(0,1fr)}fieldset{padding:18px 16px 4px}}
+@media (prefers-reduced-motion:reduce){.chips span{transition:none}}
+</style>
+</head>
+<body>
+<header class="faixa">
+  <div class="wrap top"><a href="../index.html">← Voltar à capa</a><span>Orgânicos na Embrapa</span></div>
+  <div class="wrap tit">
+    <span class="pill">Onde comprar orgânicos</span>
+    <h1>Cadastre um lugar<em>que vende orgânicos</em></h1>
+    <p class="lede">Feira, grupo de consumo, loja, restaurante, entrega ou venda na propriedade. A equipe confere cada cadastro antes de ele aparecer no mapa.</p>
+  </div>
+  <p class="credito">Foto: Katia Braga / Embrapa</p>
+</header>
+
+<main class="wrap">
+<form id="f" novalidate>
+  <fieldset>
+    <legend><span class="passo">1 de 4</span>O lugar</legend>
+    <div class="campo"><label for="nome">Nome do local <span class="obr">*</span></label>
+      <input type="text" id="nome" name="nome" placeholder="Ex.: Feira Agroecológica do Bairro X" required></div>
+    <div class="campo"><span class="rot" id="r-tipo">Tipo <span class="obr">*</span></span>
+      <div class="chips" role="radiogroup" aria-labelledby="r-tipo" data-nome="tipo" data-unico></div>
+      <input type="text" class="outro" id="tipo-outro" placeholder="Qual?" aria-label="Outro tipo" hidden></div>
+  </fieldset>
+
+  <fieldset>
+    <legend><span class="passo">2 de 4</span>Onde fica</legend>
+    <div class="campo duas">
+      <div><label for="uf">Estado <span class="obr">*</span></label><select id="uf" name="uf" required><option value="">UF</option></select></div>
+      <div><label for="municipio">Município <span class="obr">*</span></label><input type="text" id="municipio" name="municipio" list="lista-mun" autocomplete="off" required placeholder="Escolha o estado primeiro"><datalist id="lista-mun"></datalist></div>
+    </div>
+    <div class="campo"><label for="endereco">Endereço ou ponto de referência</label><input type="text" id="endereco" name="endereco"></div>
+    <div class="campo"><label for="maps">Link do Google Maps</label>
+      <p class="ajuda">Opcional. No Google Maps, toque em Compartilhar e cole o link aqui. Assim o ponto fica no lugar exato.</p>
+      <input type="url" id="maps" name="maps" placeholder="https://maps.google.com/…"></div>
+  </fieldset>
+
+  <fieldset>
+    <legend><span class="passo">3 de 4</span>Quando e o quê</legend>
+    <div class="campo"><span class="rot" id="r-dias">Dias de funcionamento</span><div class="chips" aria-labelledby="r-dias" data-nome="dias"></div></div>
+    <div class="campo"><label for="horario">Horário</label><input type="text" id="horario" name="horario" placeholder="Ex.: 7h às 12h"></div>
+    <div class="campo"><span class="rot" id="r-produtos">Produtos</span><div class="chips" aria-labelledby="r-produtos" data-nome="produtos"></div>
+      <input type="text" class="outro" id="produtos-outro" placeholder="Outros produtos (opcional)" aria-label="Outros produtos"></div>
+    <div class="campo"><span class="rot" id="r-garantia">Como a produção é garantida como orgânica</span><p class="ajuda">Marque todas as formas que existem no local.</p><div class="chips" aria-labelledby="r-garantia" data-nome="garantia"></div></div>
+    <div class="campo"><span class="rot" id="r-entrega">Faz entregas?</span><div class="chips" role="radiogroup" aria-labelledby="r-entrega" data-nome="entrega" data-unico></div></div>
+    <div class="campo"><label for="contato">Contato público</label><p class="ajuda">Telefone, site ou rede social que pode aparecer no mapa.</p><input type="text" id="contato" name="contato"></div>
+  </fieldset>
+
+  <fieldset>
+    <legend><span class="passo">4 de 4</span>Quem está cadastrando</legend>
+    <p class="ajuda" style="margin:0 0 14px">Seu nome e e-mail ficam só com a equipe e não aparecem no mapa.</p>
+    <div class="campo"><label for="quem">Seu nome <span class="obr">*</span></label><input type="text" id="quem" name="quem" autocomplete="name" required></div>
+    <div class="campo"><label for="email">Seu e-mail <span class="obr">*</span></label><input type="email" id="email" name="email" autocomplete="email" required></div>
+    <div class="campo"><label class="aut"><input type="checkbox" id="autorizo" required><span>Autorizo a publicação no mapa das informações do local (nome, tipo, endereço, dias, produtos e contato público). <span class="obr">*</span></span></label></div>
+  </fieldset>
+
+  <div class="envio">
+    <button type="submit" id="enviar">Enviar cadastro</button>
+    <small id="aviso">Os campos com <span class="obr">*</span> são obrigatórios.</small>
+  </div>
+</form>
+
+<section class="ok" id="ok" hidden tabindex="-1">
+  <h2>Cadastro enviado. Obrigado!</h2>
+  <p>A equipe vai conferir as informações. Quando o cadastro for aprovado, o lugar aparece na camada "Onde comprar" do mapa.</p>
+  <div class="acoes"><a href="./">Cadastrar outro lugar</a><a href="../ambiente/index.html">Ver o mapa</a></div>
+</section>
+</main>
+
+<script>
+// As respostas vão para o formulário Google do projeto (mesma planilha e mesma aprovação da equipe).
+// Os códigos de cada pergunta (entry.NNN) ficam em ambiente/cadastro.json, no campo "campos".
+const OPCOES = {
+  tipo: ["Feira", "Grupo de consumo ou CSA", "Loja ou mercado", "Restaurante", "Entrega em domicílio", "Venda na propriedade", "Outro"],
+  dias: ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"],
+  produtos: ["Hortaliças", "Frutas", "Grãos e cereais", "Ovos", "Leite e derivados", "Carnes", "Mel", "Pães e processados", "Plantas medicinais e temperos"],
+  garantia: ["Certificadora (selo por auditoria)", "Sistema participativo (OPAC)", "Venda direta com OCS", "Agroecológico sem certificação", "Não sei"],
+  entrega: ["Sim", "Não"]
+};
+const AUTORIZA = "Autorizo a publicação no mapa das informações do local (nome, tipo, endereço, dias, produtos e contato público).";
+const UFS = ["AC","AL","AM","AP","BA","CE","DF","ES","GO","MA","MG","MS","MT","PA","PB","PE","PI","PR","RJ","RN","RO","RR","RS","SC","SE","SP","TO"];
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let CAD = {}, MUN = null;
+
+document.querySelectorAll(".chips").forEach(box => {
+  const nome = box.dataset.nome, unico = box.hasAttribute("data-unico");
+  box.innerHTML = OPCOES[nome].map(o => `<label><input type="${unico ? "radio" : "checkbox"}" name="${nome}" value="${esc(o)}"><span>${esc(o)}</span></label>`).join("");
+});
+$("#uf").innerHTML += UFS.map(u => `<option>${u}</option>`).join("");
+document.querySelectorAll('input[name=tipo]').forEach(r => r.addEventListener("change", () => { $("#tipo-outro").hidden = $('input[name=tipo]:checked')?.value !== "Outro"; }));
+
+fetch("../ambiente/cadastro.json").then(r => r.json()).then(c => CAD = c).catch(() => {});
+fetch("../ambiente/municipios.json").then(r => r.json()).then(m => { MUN = m; listaMun(); }).catch(() => {});
+function listaMun(){
+  const uf = $("#uf").value;
+  $("#municipio").placeholder = uf ? "Comece a digitar" : "Escolha o estado primeiro";
+  if (!MUN || !uf) { $("#lista-mun").innerHTML = ""; return; }
+  $("#lista-mun").innerHTML = Object.values(MUN).filter(v => v[2].endsWith("-" + uf)).map(v => `<option value="${esc(v[2].slice(0, -3))}">`).join("");
+}
+$("#uf").addEventListener("change", listaMun);
+const chave = (m, uf) => (m||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toUpperCase().replace(/[^A-Z ]/g," ").replace(/\s+/g," ").trim() + "|" + uf;
+
+function marcaErro(el, msg){
+  const c = el.closest(".campo"); c.classList.add("invalido");
+  if (!c.querySelector(".erro")) c.insertAdjacentHTML("beforeend", `<p class="erro">${esc(msg)}</p>`);
+}
+function valida(){
+  document.querySelectorAll(".invalido").forEach(c => c.classList.remove("invalido"));
+  document.querySelectorAll(".erro").forEach(e => e.remove());
+  const erros = [];
+  if (!$("#nome").value.trim()) erros.push([$("#nome"), "Informe o nome do local."]);
+  const tipo = $('input[name=tipo]:checked');
+  if (!tipo) erros.push([document.querySelector('[data-nome=tipo]'), "Escolha o tipo."]);
+  else if (tipo.value === "Outro" && !$("#tipo-outro").value.trim()) erros.push([$("#tipo-outro"), "Diga qual é o tipo."]);
+  if (!$("#uf").value) erros.push([$("#uf"), "Escolha o estado."]);
+  if (!$("#municipio").value.trim()) erros.push([$("#municipio"), "Informe o município."]);
+  else if (MUN && $("#uf").value && !MUN[chave($("#municipio").value, $("#uf").value)]) erros.push([$("#municipio"), "Não encontramos esse município neste estado. Confira a grafia ou escolha da lista."]);
+  if ($("#maps").value.trim() && !/^https:\/\//i.test($("#maps").value.trim())) erros.push([$("#maps"), "O link deve começar com https://"]);
+  if (!$("#quem").value.trim()) erros.push([$("#quem"), "Informe seu nome."]);
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($("#email").value.trim())) erros.push([$("#email"), "Informe um e-mail válido."]);
+  if (!$("#autorizo").checked) erros.push([$("#autorizo"), "É preciso autorizar a publicação."]);
+  erros.forEach(([el, msg]) => marcaErro(el, msg));
+  if (erros.length) erros[0][0].closest(".campo").scrollIntoView({block: "center"});
+  return !erros.length;
+}
+
+$("#f").addEventListener("submit", async e => {
+  e.preventDefault();
+  if (!valida()) return;
+  const C = CAD.campos || {}, acao = (CAD.formulario || "").replace(/\/viewform.*$/, "/formResponse");
+  if (!acao || !C.nome) { $("#aviso").textContent = "O envio ainda não está configurado. Use o formulário do Google por enquanto."; return; }
+  const dados = new URLSearchParams();
+  const um = (k, v) => { if (C[k] && v) dados.append("entry." + C[k], v); };
+  const tipo = $('input[name=tipo]:checked').value;
+  if (tipo === "Outro"){ dados.append("entry." + C.tipo, "__other_option__"); dados.append("entry." + C.tipo + ".other_option_response", $("#tipo-outro").value.trim()); }
+  else um("tipo", tipo);
+  um("nome", $("#nome").value.trim()); um("uf", $("#uf").value); um("municipio", $("#municipio").value.trim());
+  um("endereco", $("#endereco").value.trim()); um("maps", $("#maps").value.trim()); um("horario", $("#horario").value.trim());
+  um("contato", $("#contato").value.trim()); um("quem", $("#quem").value.trim()); um("email", $("#email").value.trim());
+  ["dias", "produtos", "garantia", "entrega"].forEach(k => document.querySelectorAll(`input[name=${k}]:checked`).forEach(i => um(k, i.value)));
+  const outros = $("#produtos-outro").value.trim();
+  if (outros && C.produtos){ dados.append("entry." + C.produtos, "__other_option__"); dados.append("entry." + C.produtos + ".other_option_response", outros); }
+  um("autorizo", AUTORIZA);
+  $("#enviar").disabled = true; $("#enviar").textContent = "Enviando…";
+  try {
+    // o Google não devolve resposta legível para outro site (no-cors); se a rede falhar, cai no catch
+    await fetch(acao, {method: "POST", mode: "no-cors", body: dados});
+    $("#f").hidden = true; $("#ok").hidden = false; $("#ok").focus(); scrollTo(0, $("#ok").offsetTop - 20);
+  } catch (err) {
+    $("#enviar").disabled = false; $("#enviar").textContent = "Enviar cadastro";
+    $("#aviso").innerHTML = `Não conseguimos enviar agora. Tente de novo ou use o <a href="${esc(CAD.formulario)}" target="_blank" rel="noopener">formulário do Google</a>.`;
+  }
+});
+</script>
+</body>
+</html>

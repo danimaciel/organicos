@@ -64,3 +64,21 @@ function criarTudo() {
   Logger.log("Planilha da equipe: " + planilha.getUrl());
   Logger.log("Próximo passo: na planilha, Arquivo > Compartilhar > Publicar na Web > aba Publicar > CSV > Publicar. Mande esse link e o do formulário para ligarmos ao site.");
 }
+
+/**
+ * Mostra os códigos internos de cada pergunta (entry.NNN), que a página de cadastro do site
+ * usa para enviar as respostas a este formulário. Rode uma vez e copie a linha do registro.
+ */
+function mostrarCampos() {
+  const id = "1BKeItan2kOcqz-ItVf3VGfpGy-YWVvd-Qc7FFoAMDWs"; // formulário criado por criarTudo
+  const form = FormApp.openById(id);
+  const resp = form.createResponse();
+  form.getItems().forEach(it => {
+    const t = it.getType();
+    if (t === FormApp.ItemType.TEXT) resp.withItemResponse(it.asTextItem().createResponse(/e-mail/i.test(it.getTitle()) ? "a@b.com" : "x"));
+    else if (t === FormApp.ItemType.MULTIPLE_CHOICE) resp.withItemResponse(it.asMultipleChoiceItem().createResponse(it.asMultipleChoiceItem().getChoices()[0].getValue()));
+    else if (t === FormApp.ItemType.LIST) resp.withItemResponse(it.asListItem().createResponse(it.asListItem().getChoices()[0].getValue()));
+    else if (t === FormApp.ItemType.CHECKBOX) resp.withItemResponse(it.asCheckboxItem().createResponse([it.asCheckboxItem().getChoices()[0].getValue()]));
+  });
+  Logger.log("CAMPOS " + resp.toPrefilledUrl());
+}
