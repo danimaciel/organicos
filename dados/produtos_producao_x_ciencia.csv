@@ -1,0 +1,63 @@
+produto,grupo,produtores,pct_produtores,municipios,regiao_principal,conteudos_embrapa,conteudos_organicos,organicos_diretos,publicacoes_org,projetos_org,solucoes_org,produtores_por_conteudo_organico
+"Citros (laranja, limão, tangerina)",Frutas,10226,44.6,1025,Sul,2920,90,53,82,5,3,114.0
+Abóbora e abobrinha,Hortaliças de fruto,9996,43.6,977,Sul,713,41,32,37,2,2,244.0
+Mandioca,Raízes e tubérculos,9977,43.5,980,Sul,4047,162,127,147,8,7,62.0
+"Cheiro-verde (cebolinha, coentro, salsa)",Hortaliças de folha,9730,42.4,950,Sul,235,51,46,46,4,1,191.0
+Banana,Frutas,9261,40.4,962,Sul,2724,169,145,164,3,2,55.0
+Alface,Hortaliças de folha,9122,39.8,918,Sul,647,99,88,90,6,3,92.0
+Couve,Hortaliças de folha,8542,37.2,894,Sul,116,17,14,16,0,1,502.0
+Milho,Grãos,8278,36.1,939,Sul,13457,461,305,402,42,17,18.0
+Tomate,Hortaliças de fruto,8018,35.0,902,Sul,1743,153,138,141,11,1,52.0
+Feijão,Grãos,7746,33.8,874,Sul,9117,359,243,319,31,9,22.0
+Pimentão e pimentas,Hortaliças de fruto,7724,33.7,880,Sul,1861,62,45,57,4,1,125.0
+Batata-doce,Raízes e tubérculos,7462,32.5,842,Sul,457,35,29,30,2,3,213.0
+Beterraba,Raízes e tubérculos,7155,31.2,783,Sul,115,18,15,16,1,1,398.0
+"Outras folhosas (espinafre, almeirão, acelga, agrião)",Hortaliças de folha,7080,30.9,772,Sul,81,6,4,4,1,1,1180.0
+Cenoura,Raízes e tubérculos,7069,30.8,785,Sul,465,63,59,58,3,2,112.0
+Brócolis e couve-flor,Hortaliças de folha,6683,29.1,732,Sul,98,27,23,23,2,2,248.0
+Pepino,Hortaliças de fruto,6568,28.6,743,Sul,203,16,11,12,3,1,410.0
+Repolho,Hortaliças de folha,6554,28.6,698,Sul,183,19,16,16,2,1,345.0
+Chuchu e maxixe,Hortaliças de fruto,6514,28.4,731,Sul,73,1,1,1,0,0,6514.0
+Cebola e alho,Raízes e tubérculos,6358,27.7,725,Sul,931,69,63,67,1,1,92.0
+Rúcula,Hortaliças de folha,6323,27.6,761,Sul,41,11,10,10,0,1,575.0
+"Frutas de clima temperado (pêssego, ameixa, caqui, maçã)",Frutas,5871,25.6,713,Sul,2458,71,48,69,2,0,83.0
+Quiabo,Hortaliças de fruto,5530,24.1,717,Sul,88,10,10,10,0,0,553.0
+Feijão-vagem e ervilha,Hortaliças de fruto,5526,24.1,645,Sul,237,19,12,17,2,0,291.0
+"Frutas nativas (jabuticaba, pitanga, umbu, cajá, butiá, araçá)",Frutas,5469,23.8,773,Sul,1589,26,20,21,3,2,210.0
+Berinjela e jiló,Hortaliças de fruto,5308,23.1,688,Sul,145,7,7,7,0,0,758.0
+Plantas medicinais e aromáticas,Plantas medicinais e aromáticas,5255,22.9,709,Sul,2534,90,69,75,14,1,58.0
+Abacate,Frutas,5158,22.5,690,Sul,92,8,4,7,0,1,645.0
+Melancia e melão,Frutas,4772,20.8,662,Sul,1794,86,65,84,1,1,55.0
+Mamão,Frutas,4327,18.9,669,Nordeste,758,31,17,27,3,1,140.0
+Maracujá,Frutas,4134,18.0,676,Sul,1826,72,62,65,4,3,57.0
+Manga,Frutas,4064,17.7,614,Nordeste,1667,87,77,84,1,2,47.0
+Inhame e taro,Raízes e tubérculos,3993,17.4,521,Sul,135,13,11,10,2,1,307.0
+Acerola,Frutas,3983,17.4,594,Nordeste,524,19,18,15,3,1,210.0
+Goiaba,Frutas,3778,16.5,648,Sul,730,20,15,16,3,1,189.0
+Gengibre e açafrão,Raízes e tubérculos,3631,15.8,591,Sul,143,5,2,5,0,0,726.0
+Batata,Raízes e tubérculos,3459,15.1,466,Sul,989,47,40,45,0,2,74.0
+Morango,Frutas,2808,12.2,475,Sul,702,43,40,43,0,0,65.0
+Açaí,Frutas,2422,10.6,227,Norte,1247,28,21,20,7,1,86.0
+Abacaxi,Frutas,2332,10.2,452,Sul,909,64,60,58,2,4,36.0
+"Cana-de-açúcar, açúcar e rapadura",Culturas perenes e agroindústria,2247,9.8,449,Sul,3000,94,74,77,14,3,24.0
+Uva e vinho,Frutas,2106,9.2,373,Sul,5275,100,78,94,4,2,21.0
+Amendoim,Grãos,1990,8.7,379,Sul,1363,56,26,54,2,0,36.0
+Coco,Frutas,1944,8.5,386,Nordeste,1400,51,32,46,5,0,38.0
+Mel e produtos das abelhas,Produção animal,1638,7.1,186,Nordeste,1557,110,102,103,5,2,15.0
+Caju,Frutas,1525,6.6,313,Nordeste,1228,20,18,20,0,0,76.0
+Café,Culturas perenes e agroindústria,1445,6.3,371,Sudeste,3488,178,116,171,6,1,8.0
+Arroz,Grãos,1335,5.8,235,Sul,6535,105,64,90,11,4,13.0
+Cacau,Culturas perenes e agroindústria,956,4.2,186,Nordeste,433,27,8,26,1,0,35.0
+Cupuaçu,Frutas,756,3.3,110,Norte,1206,66,16,64,2,0,11.0
+Trigo e cereais de inverno,Grãos,707,3.1,161,Sul,5301,74,40,68,3,3,10.0
+Castanha-do-brasil,Extrativismo,576,2.5,138,Norte,1059,35,5,34,0,1,16.0
+Erva-mate,Culturas perenes e agroindústria,506,2.2,103,Sul,747,27,20,24,2,1,19.0
+Ovos e frango,Produção animal,495,2.2,119,Norte,3337,104,81,94,5,5,5.0
+Soja,Grãos,451,2.0,129,Sul,10530,164,71,134,21,9,3.0
+"Pequi, baru e buriti",Extrativismo,392,1.7,95,Norte,1018,13,12,10,2,1,30.0
+Suínos,Produção animal,308,1.3,92,Nordeste,2517,28,23,26,2,0,11.0
+Leite e derivados,Produção animal,295,1.3,89,Sul,7235,143,130,124,14,5,2.0
+Guaraná,Culturas perenes e agroindústria,215,0.9,55,Nordeste,701,17,11,16,1,0,13.0
+Carne bovina,Produção animal,132,0.6,54,Sudeste,4216,23,18,22,0,1,6.0
+Babaçu,Extrativismo,85,0.4,13,Nordeste,279,5,5,4,0,1,17.0
+Peixes,Produção animal,72,0.3,32,Sul,3230,34,22,29,5,0,2.0

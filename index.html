@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Orgânicos na Embrapa</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="O que se produz e o que se pesquisa sobre orgânicos e agroecologia no Brasil: conteúdos da Embrapa cruzados com o Cadastro Nacional de Produtores Orgânicos.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Fraunces:ital,opsz,wght@0,9..144,700;1,9..144,500&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: capa com foto real ao fundo (clara no alto, verde-escura embaixo), título e busca na base da foto; abaixo, entradas por perfil, o mapa produção x ciência, números e fontes */
+:root{
+  --bg:#f3f5f0; --surface:#ffffff; --ink:#1d2a22; --muted:#5d6b61; --line:#d6ddd3;
+  --veu:243 240 228; --green:#2f6b4f; --green-soft:#d9e8de; --ochre:#b8860b; --ochre-soft:#f3e6c4; --land:#e3e9df; --focus:#1f5fbf;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --f-serif:"Fraunces", Georgia, "Times New Roman", serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121915; --surface:#1a231e; --ink:#e4ebe5; --muted:#9aaa9f; --line:#2e3b33;
+  --veu:18 25 21; --green:#7cc39b; --green-soft:#24392d; --ochre:#e0b54a; --ochre-soft:#3a3120; --land:#1f2a23; --focus:#8db7ff; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121915; --surface:#1a231e; --ink:#e4ebe5; --muted:#9aaa9f; --line:#2e3b33;
+  --veu:18 25 21; --green:#7cc39b; --green-soft:#24392d; --ochre:#e0b54a; --ochre-soft:#3a3120; --land:#1f2a23; --focus:#8db7ff; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:17px/1.55 var(--f-body)}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance}
+p{margin:0}
+a{color:inherit}
+a:focus-visible,button:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+
+.top{display:flex;justify-content:space-between;align-items:center;padding-block:20px;font-size:14px;color:var(--muted)}
+.top b{font-family:var(--f-display);color:var(--ink);font-size:16px;letter-spacing:.01em}
+
+.capa{position:relative;min-height:min(96vh,940px);display:flex;flex-direction:column;background:#0c2a14 url("img/foto_capa.jpg") center 78%/cover no-repeat;isolation:isolate;color:#fff;
+  --lima:#b9e36a; --capa-fundo:12 42 20}
+.capa::before{content:"";position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(to bottom, rgb(var(--capa-fundo) / .35) 0%, rgb(var(--capa-fundo) / 0) 20%, rgb(var(--capa-fundo) / .1) 36%, rgb(var(--capa-fundo) / .7) 52%, rgb(var(--capa-fundo) / .93) 70%, rgb(var(--capa-fundo)) 90%)}
+.capa .top, .capa .top b{color:#fff}
+.capa .top span{color:rgb(255 255 255 / .85)}
+.capa .wrap{width:100%}
+.capa .pill{align-self:center;margin-top:8px;font-family:var(--f-body);font-weight:600;font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:#f6efd8;border:1.5px solid rgb(246 239 216 / .85);padding:10px 22px;border-radius:999px;background:rgb(var(--capa-fundo) / .15);backdrop-filter:blur(3px)}
+.centro{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;text-align:center;padding-block:24px 56px}
+h1{font-family:var(--f-serif);font-size:clamp(40px,7vw,86px);font-weight:700;line-height:1.02;letter-spacing:-.01em;color:#fff;text-shadow:0 2px 18px rgb(0 0 0 / .25)}
+h1 .l2{display:block;font-style:italic;font-weight:500;color:var(--lima)}
+.divisor{display:flex;align-items:center;gap:12px;margin-top:22px}
+.divisor::before,.divisor::after{content:"";width:110px;height:1.5px;background:rgb(255 255 255 / .8)}
+.divisor i{width:28px;height:13px;border-radius:50%;background:var(--lima)}
+.lede{font-size:clamp(17px,1.9vw,21px);color:rgb(255 255 255 / .92);max-width:60ch;margin-top:18px}
+.busca{display:flex;align-items:center;gap:10px;width:min(660px,100%);margin-top:30px;background:#fff;border-radius:999px;padding:7px 7px 7px 22px;box-shadow:0 18px 40px -18px rgb(0 0 0 / .6)}
+.busca svg{width:20px;height:20px;flex:none;color:#5d6b61}
+.busca input{flex:1;min-width:0;border:0;background:transparent;font:17px var(--f-body);color:#1d2a22;padding:10px 0}
+.busca input::placeholder{color:#6b776e}
+.busca input:focus{outline:none}
+.busca:focus-within{box-shadow:0 18px 40px -18px rgb(0 0 0 / .6), 0 0 0 3px var(--lima)}
+.busca button{font:700 16px var(--f-display);background:#1f4d2c;color:#fff;border:0;border-radius:999px;padding:13px 24px;cursor:pointer;flex:none}
+.busca button:hover{background:#2a6339}
+.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:16px;max-width:780px}
+.chips a{font-size:15px;text-decoration:none;color:#fff;background:rgb(255 255 255 / .1);border:1px solid rgb(255 255 255 / .35);padding:8px 15px;border-radius:999px;transition:background .15s}
+.chips a:hover{background:rgb(255 255 255 / .22)}
+.fontes-linha{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 14px;margin-top:26px;font-weight:600;font-size:14px;letter-spacing:.06em;text-transform:uppercase}
+.fontes-linha span:nth-child(odd){color:var(--lima)}
+.fontes-linha b{color:rgb(255 255 255 / .6);font-weight:400}
+.capa h1, .capa .lede{text-shadow:0 2px 14px rgb(0 0 0 / .45)}
+@media (max-width:560px){.capa .pill{letter-spacing:.1em;font-size:12px;padding:8px 14px}.capa h1{font-size:44px}.capa{background-position:30% 80%}.capa::before{background:linear-gradient(to bottom, rgb(var(--capa-fundo) / .35) 0%, rgb(var(--capa-fundo) / .05) 18%, rgb(var(--capa-fundo) / .6) 36%, rgb(var(--capa-fundo) / .9) 55%, rgb(var(--capa-fundo)) 85%)}}
+.credito{position:absolute;right:max(16px,env(safe-area-inset-right,0px));bottom:10px;font-size:12px;color:rgb(255 255 255 / .75);margin:0}
+@media (max-width:560px){.busca{padding-left:16px}.busca button{padding:12px 16px}.capa{min-height:auto}.centro{padding-block:24px 64px}}
+
+.btn{display:inline-flex;align-items:center;gap:10px;font:700 18px var(--f-display);text-decoration:none;background:var(--green);color:var(--bg);padding:16px 26px;border-radius:999px;transition:transform .15s ease, box-shadow .15s ease}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px -10px var(--green)}
+.sec-perfis{padding-block:56px 8px}
+.quem{font-family:var(--f-mono);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.perfis{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:14px}
+.perfil{display:flex;flex-direction:column;gap:6px;text-decoration:none;background:var(--surface);border:1.5px solid var(--line);border-top:6px solid var(--c,var(--green));border-radius:16px;padding:18px 20px 16px;transition:border-color .15s, transform .15s}
+.perfil:hover{border-color:var(--c,var(--green));transform:translateY(-3px)}
+.perfil .pk{font-size:14px;color:var(--green);font-weight:600}
+.perfil b{font-family:var(--f-display);font-size:19px;font-weight:700;line-height:1.25}
+.perfil i{font-style:normal;font-family:var(--f-display);font-size:24px;color:var(--c,var(--green));margin-top:auto;padding-top:6px}
+.perfil.p1{--c:var(--ochre)} .perfil.p2{--c:var(--green)} .perfil.p3{--c:var(--ink)} .perfil.p4{--c:var(--muted)}
+.todos{margin-top:14px;font-size:15px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.perfil,.chips a{transition:none}}
+
+.duo{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:40px;align-items:center;padding-block:56px 8px}
+@media (max-width:880px){.duo{grid-template-columns:minmax(0,1fr);gap:8px}}
+.duo h2{font-size:clamp(26px,3vw,34px);font-weight:700}
+.duo > div > p{color:var(--muted);margin-top:10px;max-width:46ch}
+.mapbox{position:relative;min-width:0}
+#mapa{width:100%;max-width:560px;margin-inline:auto;aspect-ratio:1/1;display:block}
+.leg{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:14px;color:var(--muted);margin-top:18px}
+.leg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:7px;vertical-align:0}
+.duo .nums{margin-top:24px;grid-template-columns:repeat(2,minmax(0,1fr))}
+
+.nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.num{padding:22px 18px 22px 0;font-variant-numeric:tabular-nums}
+.num b{font-family:var(--f-display);font-size:clamp(30px,3.6vw,42px);font-weight:700;display:block;line-height:1}
+.num span{font-size:14px;color:var(--muted)}
+.num.o b{color:var(--ochre)} .num.g b{color:var(--green)}
+
+.sec{padding-block:64px 8px}
+.sec h2{font-size:clamp(26px,3vw,34px);font-weight:700}
+.sec > p{color:var(--muted);max-width:62ch;margin-top:10px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:28px;margin-top:28px}
+.col h3{font-size:19px;margin-bottom:6px}
+.col p{color:var(--muted);font-size:16px}
+.col .k{font-family:var(--f-mono);font-size:12px;color:var(--green);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:8px}
+
+.fontes{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:28px}
+.fonte{display:flex;flex-direction:column;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;text-decoration:none;transition:border-color .15s}
+.fonte:hover{border-color:var(--green)}
+.logo{height:56px;display:flex;align-items:center}
+.logo img{max-height:56px;max-width:180px;object-fit:contain}
+.logo .wm{display:flex;align-items:baseline;gap:8px;font-family:var(--f-display);font-weight:800;font-size:28px;letter-spacing:-.01em;line-height:1}
+.logo .wm small{font-family:var(--f-body);font-weight:600;font-size:13px;color:var(--muted);letter-spacing:0}
+.logo.tem-logo .wm{display:none}
+.fonte p{font-size:15px;color:var(--muted)}
+.fonte .uso{font-family:var(--f-mono);font-size:12px;color:var(--ink);border-top:1px dashed var(--line);padding-top:10px;margin-top:auto}
+
+.fim{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;align-items:center;margin-top:72px;padding-block:28px 40px;border-top:1px solid var(--line);font-size:14px;color:var(--muted)}
+.btn.sm{font-size:16px;padding:12px 20px}
+@media (prefers-reduced-motion:reduce){.btn{transition:none}}
+</style>
+
+<header class="capa">
+  <div class="wrap"><div class="top"><b>Orgânicos na Embrapa</b><span>Dados abertos · out. 2026</span></div></div>
+  <div class="wrap centro">
+    <span class="pill">Orgânicos e agroecologia no Brasil</span>
+    <div style="flex:1;min-height:clamp(60px,14vh,180px)"></div>
+    <h1>O que se produz<span class="l2">e o que se pesquisa</span></h1>
+    <div class="divisor" aria-hidden="true"><i></i></div>
+    <p class="lede">Os produtores orgânicos de cada município, lado a lado com as publicações, projetos e soluções da Embrapa. Os números vêm de fontes públicas; o assistente só explica o que eles mostram.</p>
+    <form class="busca" id="busca" action="ambiente/index.html" role="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="busca-in" name="p" type="search" placeholder="Busque um produto, um lugar ou faça uma pergunta" aria-label="Sua pergunta" autocomplete="off">
+      <button type="submit">Perguntar</button>
+    </form>
+    <div class="chips">
+      <a href="ambiente/index.html#p=Caf%C3%A9%20org%C3%A2nico%20no%20Nordeste">Café orgânico no Nordeste</a>
+      <a href="ambiente/index.html#p=Quais%20produtos%20t%C3%AAm%20pouca%20pesquisa%20org%C3%A2nica%3F">Onde falta pesquisa</a>
+      <a href="ambiente/index.html#p=Quem%20pesquisa%20agroecologia%20na%20Caatinga%3F">Agroecologia na Caatinga</a>
+      <a href="ambiente/index.html#p=Morango%20org%C3%A2nico%20no%20Sul">Morango orgânico no Sul</a>
+    </div>
+    <div class="fontes-linha" aria-label="Fontes"><span>Embrapa</span><b>•</b><span>CNPO</span><b>•</b><span>SIGORG</span><b>•</b><span>IBGE</span></div>
+  </div>
+  <p class="credito">Foto: Katia Braga / Embrapa</p>
+</header>
+
+<div class="wrap">
+  <section class="sec-perfis">
+    <p class="quem">Ou entre pelo seu caminho</p>
+    <div class="perfis">
+      <a class="perfil p1" href="ambiente/index.html#produtor"><span class="pk">Sou produtor ou produtora</span><b>Técnicas e soluções para o que eu planto ou crio</b><i aria-hidden="true">→</i></a>
+      <a class="perfil p2" href="ambiente/index.html#extensionista"><span class="pk">Sou extensionista</span><b>Onde estão os produtores e que materiais usar</b><i aria-hidden="true">→</i></a>
+      <a class="perfil p3" href="ambiente/index.html#pesquisador"><span class="pk">Sou pesquisador ou pesquisadora</span><b>Onde falta pesquisa e quem já trabalha no tema</b><i aria-hidden="true">→</i></a>
+      <a class="perfil p4" href="ambiente/index.html"><span class="pk">Geral</span><b>Tudo junto: mapa, filtros, cruzamentos e perguntas</b><i aria-hidden="true">→</i></a>
+    </div>
+    <p class="todos">Funciona no navegador, sem cadastro.</p>
+  </section>
+
+  <section class="duo">
+    <div>
+      <h2>Onde se produz e onde se pesquisa</h2>
+      <p>Cada ponto ocre é um município com produtores orgânicos cadastrados. Cada ponto verde é um município citado em pesquisas da Embrapa sobre o tema. Onde só há ocre, a produção anda sem ciência por perto.</p>
+      <div class="nums" id="nums">
+        <div class="num g"><b>4.464</b><span>publicações</span></div>
+        <div class="num g"><b>241</b><span>projetos de pesquisa</span></div>
+        <div class="num g"><b>63</b><span>soluções tecnológicas</span></div>
+        <div class="num"><b>2.924</b><span>pesquisadores e pesquisadoras</span></div>
+        <div class="num o"><b>22.939</b><span>produtores orgânicos</span></div>
+        <div class="num o"><b>1.628</b><span>municípios com produção</span></div>
+      </div>
+      <div class="leg"><span><i style="background:var(--ochre)"></i>onde há produtores orgânicos</span><span><i style="background:var(--green)"></i>onde a pesquisa da Embrapa cita trabalho</span></div>
+    </div>
+    <div class="mapbox">
+      <canvas id="mapa" width="1200" height="1200" role="img" aria-label="Mapa do Brasil com municípios que têm produtores orgânicos e municípios citados em pesquisas da Embrapa"></canvas>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2>O que você encontra</h2>
+    <div class="cols">
+      <div class="col"><span class="k">Mapa</span><h3>Onde as coisas acontecem</h3><p>Estados e municípios com conteúdos da Embrapa e com produtores orgânicos, com camada de biomas.</p></div>
+      <div class="col"><span class="k">Produção × Ciência</span><h3>Onde falta pesquisa</h3><p>62 produtos comparados: quantos produtores declaram cada um e quanto a Embrapa já estudou em sistema orgânico.</p></div>
+      <div class="col"><span class="k">Pessoas</span><h3>Quem trabalha no tema</h3><p>Pesquisadores e pesquisadoras ligados a cada recorte de produto, tema, lugar e período.</p></div>
+      <div class="col"><span class="k">Pergunte</span><h3>Perguntas em palavras simples</h3><p>"Quem pesquisa mel na Caatinga?" O assistente responde com os dados e ajusta o mapa, sem conta e sem enviar nada para fora.</p></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2>De onde vêm os dados</h2>
+    <p>Todas as fontes são públicas. Os conteúdos foram classificados por uma taxonomia de orgânicos e agroecologia; os lugares, por município, região e bioma.</p>
+    <div class="fontes">
+      <a class="fonte" href="https://www.embrapa.br" target="_blank" rel="noopener">
+        <div class="logo"><img src="logos/embrapa.svg" alt="Embrapa" onload="this.parentNode.classList.add('tem-logo')" onerror="this.remove()"><span class="wm">Embrapa</span></div>
+        <p>Publicações, projetos de pesquisa e soluções tecnológicas, além do cadastro de autores da empresa.</p>
+        <span class="uso">base de setembro de 2026</span>
+      </a>
+      <a class="fonte" href="https://www.gov.br/agricultura/pt-br/assuntos/sustentabilidade/organicos" target="_blank" rel="noopener">
+        <div class="logo"><img src="logos/mapa.svg" alt="Ministério da Agricultura e Pecuária" onload="this.parentNode.classList.add('tem-logo')" onerror="this.remove()"><span class="wm">CNPO <small>MAPA</small></span></div>
+        <p>Cadastro Nacional de Produtores Orgânicos: produtores, municípios, produtos e quem garante o selo.</p>
+        <span class="uso">janeiro de 2026</span>
+      </a>
+      <a class="fonte" href="https://www.gov.br/agricultura/pt-br/assuntos/sustentabilidade/organicos" target="_blank" rel="noopener">
+        <div class="logo"><img src="logos/sigorg.svg" alt="SIGORG" onload="this.parentNode.classList.add('tem-logo')" onerror="this.remove()"><span class="wm">SIGORG <small>MAPA</small></span></div>
+        <p>Sistema de informações de orgânicos: unidades de produção, atividades e validade dos certificados.</p>
+        <span class="uso">certificados 2025–2026</span>
+      </a>
+      <a class="fonte" href="https://www.ibge.gov.br" target="_blank" rel="noopener">
+        <div class="logo"><img src="logos/ibge.svg" alt="IBGE" onload="this.parentNode.classList.add('tem-logo')" onerror="this.remove()"><span class="wm">IBGE</span></div>
+        <p>Lista de municípios e estados, malha municipal de 2022 e mapa de biomas de 2019.</p>
+        <span class="uso">localidades · biomas</span>
+      </a>
+      <a class="fonte" href="https://github.com/ipeaGIT/geobr" target="_blank" rel="noopener">
+        <div class="logo"><img src="logos/geobr.png" alt="geobr / Ipea" onload="this.parentNode.classList.add('tem-logo')" onerror="this.remove()"><span class="wm">geobr <small>Ipea</small></span></div>
+        <p>Pacote aberto do Ipea que distribui as malhas oficiais do IBGE usadas nos mapas.</p>
+        <span class="uso">malhas geográficas</span>
+      </a>
+    </div>
+  </section>
+
+  <footer class="fim">
+    <span>Os números vêm de leitura automática de texto e servem para explorar. Confira o conteúdo original antes de citar.</span>
+    <a class="btn sm" href="ambiente/index.html">Entrar no ambiente →</a>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+if (matchMedia("(max-width:560px)").matches) document.getElementById("busca-in").placeholder = "Pergunte ou busque";
+document.getElementById("busca").addEventListener("submit", e => {
+  e.preventDefault(); const q = document.getElementById("busca-in").value.trim();
+  location.href = "ambiente/index.html" + (q ? "#p=" + encodeURIComponent(q) : "");
+});
+(async function(){
+  const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const fmt = n => n.toLocaleString("pt-BR");
+  let est, capa;
+  try { [est, capa] = await Promise.all(["ambiente/estados.geojson", "capa.json"].map(u => fetch(u).then(r => r.json()))); } catch(e){ return; }
+  const s = capa.st;
+  document.getElementById("nums").innerHTML = [["g",s.pub,"publicações"],["g",s.proj,"projetos de pesquisa"],["g",s.sol,"soluções tecnológicas"],["",s.pes,"pesquisadores e pesquisadoras"],["o",s.prod,"produtores orgânicos"],["o",s.munprod,"municípios com produção"]]
+    .map(([c,v,l]) => `<div class="num ${c}"><b>${fmt(v)}</b><span>${l}</span></div>`).join("");
+  const cv = document.getElementById("mapa"), ctx = cv.getContext("2d"), W = cv.width;
+  const proj = d3.geoMercator().fitExtent([[20,20],[W-20,W-20]], est);
+  const path = d3.geoPath(proj, ctx);
+  const rP = d3.scaleSqrt().domain([0, d3.max(capa.prod, d => d[2])]).range([2.5, 30]);
+  const rC = d3.scaleSqrt().domain([0, d3.max(capa.cie, d => d[2])]).range([3, 26]);
+  const reduz = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function desenha(t){
+    ctx.clearRect(0,0,W,W);
+    ctx.fillStyle = css("--land"); ctx.strokeStyle = css("--bg"); ctx.lineWidth = 2;
+    for (const f of est.features){ ctx.beginPath(); path(f); ctx.fill(); ctx.stroke(); }
+    const pontos = (arr, r, cor, a) => { ctx.fillStyle = cor; ctx.globalAlpha = a;
+      for (const [la, lo, n] of arr){ const [x, y] = proj([lo, la]); ctx.beginPath(); ctx.arc(x, y, r(n) * t, 0, 7); ctx.fill(); } ctx.globalAlpha = 1; };
+    pontos(capa.prod, rP, css("--ochre"), .5);
+    pontos(capa.cie, rC, css("--green"), .75);
+  }
+  if (reduz) desenha(1);
+  else { const t0 = performance.now(); const step = now => { const t = Math.max(0, Math.min(1, (now - t0) / 1400)); desenha(d3.easeCubicOut(t)); if (t < 1) requestAnimationFrame(step); }; requestAnimationFrame(step); }
+  const redesenha = () => desenha(1);
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", redesenha);
+  new MutationObserver(redesenha).observe(document.documentElement, {attributes:true, attributeFilter:["data-theme"]});
+})();
+</script>
+
+</body>
+</html>

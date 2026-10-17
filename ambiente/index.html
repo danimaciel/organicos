@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Orgânicos na Embrapa</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: caderno de campo — cabeçalho curto, barra de filtros fixa, abas; o mapa é a peça central */
+:root{
+  --bg:#f3f5f0; --surface:#ffffff; --ink:#1d2a22; --muted:#5d6b61; --line:#d6ddd3;
+  --green:#2f6b4f; --green-soft:#d9e8de; --ochre:#b8860b; --ochre-soft:#f3e6c4;
+  --map-empty:#e6ebe3; --focus:#1f5fbf;
+  --b-amz:#3f8f5a; --b-caa:#c99a3b; --b-cer:#9a7b3c; --b-mat:#2f7d74; --b-pam:#8fae5a; --b-pan:#5a8fb8;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:36px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121915; --surface:#1a231e; --ink:#e4ebe5; --muted:#9aaa9f; --line:#2e3b33;
+  --green:#7cc39b; --green-soft:#24392d; --ochre:#e0b54a; --ochre-soft:#3a3120; --map-empty:#222d26; --focus:#8db7ff;
+  --b-amz:#4fa56b; --b-caa:#d2a650; --b-cer:#b0915a; --b-mat:#47a096; --b-pam:#a3c06e; --b-pan:#74a7cf; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121915; --surface:#1a231e; --ink:#e4ebe5; --muted:#9aaa9f; --line:#2e3b33;
+  --green:#7cc39b; --green-soft:#24392d; --ochre:#e0b54a; --ochre-soft:#3a3120; --map-empty:#222d26; --focus:#8db7ff;
+  --b-amz:#4fa56b; --b-caa:#d2a650; --b-cer:#b0915a; --b-mat:#47a096; --b-pam:#a3c06e; --b-pan:#74a7cf; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--f-body)}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:var(--s5)}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(28px,4vw,40px);font-weight:700;letter-spacing:-.01em}
+h2{font-size:22px;font-weight:700}
+h3{font-size:16px;font-weight:700}
+p{margin:0}
+.lede{color:var(--muted);max-width:68ch;margin-top:var(--s2)}
+.kpis{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s5);margin-top:var(--s4);font-variant-numeric:tabular-nums}
+.kpi b{font-family:var(--f-display);font-size:26px;display:block;line-height:1}
+.kpi span{font-size:13px;color:var(--muted)}
+.tabs{display:flex;flex-wrap:wrap;gap:var(--s1);margin-top:var(--s5);border-bottom:1px solid var(--line)}
+.tab{background:none;border:0;border-bottom:3px solid transparent;padding:var(--s2) var(--s3);font:600 15px var(--f-body);color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{color:var(--ink);border-color:var(--green)}
+button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.filters{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:var(--s3);display:flex;flex-wrap:wrap;gap:var(--s2);align-items:end;border-bottom:1px solid var(--line)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.f{display:flex;flex-direction:column;gap:2px;min-width:0}
+.f label{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+select,input[type=search],input[type=number]{font:14px var(--f-body);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:6px 8px;max-width:100%}
+input[type=number]{width:5.5em}
+.btn{font:600 14px var(--f-body);background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px 12px;cursor:pointer}
+.btn.primary{background:var(--green);border-color:var(--green);color:var(--bg)}
+.st{font-size:12px;border-radius:99px;padding:1px 9px;white-space:nowrap}
+.st.lac{background:var(--ochre-soft)} .st.ok{background:var(--green-soft)} .st.mu{border:1px solid var(--line)}
+.bi{display:grid;grid-template-columns:4.5em minmax(60px,1fr);gap:6px;align-items:center}
+.bi i{display:block;height:9px;border-radius:2px}
+#cz tr{cursor:pointer}
+#cz tr.sel td{background:var(--green-soft)}
+.perfilb{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;margin-top:var(--s5);padding:var(--s4);border-radius:12px;background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--green)}
+.perfilb > div:first-child{flex:1 1 280px;min-width:0}
+.perfilb .pk{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--green);font-weight:600}
+.perfilb p{font-size:15px}
+.voltar{display:inline-block;margin-bottom:10px;font-size:15px;font-weight:600;color:var(--green);text-decoration:none}
+.voltar:hover{text-decoration:underline}
+.pf-sair{font-size:14px;color:var(--muted)}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:13px;background:var(--ochre-soft);border-radius:99px;padding:2px 10px}
+.chip button{background:none;border:0;color:inherit;cursor:pointer;font-size:14px;padding:0}
+@media (max-width:700px){.filters{position:static}}
+.panel{display:none;padding-top:var(--s5)}
+.panel.on{display:block}
+.grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:var(--s5)}
+@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:var(--s4);min-width:0}
+.maptools{display:flex;flex-wrap:wrap;gap:var(--s3);align-items:center;margin-bottom:var(--s3);font-size:14px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{background:var(--surface);color:var(--muted);border:0;padding:5px 10px;font:600 13px var(--f-body);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--green-soft);color:var(--ink)}
+#map{width:100%;aspect-ratio:1/1;max-height:640px;display:block;touch-action:none}
+#map .uf{stroke:var(--surface);stroke-width:.8;cursor:pointer}
+#map .uf.sel{stroke:var(--ink);stroke-width:2}
+#map .bio{opacity:.55}
+#map .dot{stroke:var(--surface);stroke-width:.6;cursor:pointer}
+.legend{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);font-size:12px;color:var(--muted);margin-top:var(--s2)}
+.sw{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);font-size:13px;padding:6px 9px;border-radius:6px;max-width:260px;z-index:20}
+.bars{display:flex;flex-direction:column;gap:6px}
+.bar{display:grid;grid-template-columns:minmax(0,11em) minmax(0,1fr) 3.5em;gap:var(--s2);align-items:center;font-size:13px;cursor:pointer;background:none;border:0;color:var(--ink);text-align:left;padding:0}
+.bar i{display:block;height:12px;border-radius:2px;background:var(--green)}
+.bar.pr i{background:var(--ochre)}
+.bar em{font-style:normal;font-family:var(--f-mono);font-size:12px;text-align:right;color:var(--muted)}
+.bar span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar.sel span{font-weight:700}
+.sub{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:var(--s4) 0 var(--s2)}
+#timeline{width:100%;height:120px;display:block}
+.list{display:flex;flex-direction:column}
+.item{padding:var(--s3) 0;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:4px;min-width:0}
+.item a{color:var(--ink);font-weight:600;text-decoration:none}
+.item a:hover{text-decoration:underline}
+.meta{font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 10px}
+.tag{font-size:12px;border:1px solid var(--line);border-radius:99px;padding:0 8px}
+.tag.n{background:var(--green-soft);border-color:transparent}
+.tag.a{background:var(--ochre-soft);border-color:transparent}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;white-space:nowrap}
+td.num{text-align:right;font-family:var(--f-mono);font-size:13px}
+.more{margin-top:var(--s3)}
+.chat{display:flex;flex-direction:column;gap:var(--s3)}
+.msg{max-width:72ch;padding:var(--s3) var(--s4);border-radius:10px}
+.msg ul{margin:6px 0;padding-left:1.2em}
+.msg li{margin:4px 0}
+.msg a{color:var(--ink)}
+.msg .meta button{margin-right:6px}
+.msg.u{align-self:flex-end;background:var(--green-soft)}
+.msg.c{background:var(--surface);border:1px solid var(--line)}
+.msg.s{color:var(--muted);font-size:13px;padding:0}
+.ask{display:flex;gap:var(--s2);flex-wrap:wrap}
+.ask input{flex:1 1 260px;font:15px var(--f-body);padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);min-width:0}
+.sugs{display:flex;flex-wrap:wrap;gap:var(--s2)}
+.sugs button{font:14px var(--f-body);background:var(--surface);color:var(--ink);border:1px dashed var(--line);border-radius:99px;padding:4px 12px;cursor:pointer}
+.prose{max-width:72ch;display:flex;flex-direction:column;gap:var(--s3)}
+.prose ul{margin:0;padding-left:1.2em}
+.taxo{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:var(--s3)}
+.taxo div{border-top:3px solid var(--green);padding-top:var(--s2)}
+.taxo div.p{border-color:var(--ochre)}
+.taxo div.x{border-color:var(--line)}
+.taxo code{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.foot{font-size:13px;color:var(--muted);margin-top:var(--s6)}
+@media (prefers-reduced-motion:no-preference){.dot{transition:r .2s}}
+</style>
+
+<div class="wrap">
+  <header>
+    <a class="voltar" id="voltar" href="../index.html">← Voltar à capa</a>
+    <h1>Orgânicos na Embrapa</h1>
+    <p class="lede">O que a Embrapa já pesquisou, publicou e lançou sobre produção orgânica e agroecologia, onde isso acontece no Brasil e quem são os produtores orgânicos cadastrados em cada lugar.</p>
+    <div class="kpis" id="kpis"></div>
+  </header>
+
+  <div class="perfilb" id="perfilb" hidden>
+    <div><span class="pk" id="pf-quem"></span><p id="pf-txt"></p></div>
+    <div class="sugs" id="pf-sugs"></div>
+    <a href="#" id="pf-sair" class="pf-sair">Trocar para o geral</a>
+  </div>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-p="mapa" id="t-mapa">Mapa</button>
+    <button class="tab" role="tab" aria-selected="false" data-p="conteudos" id="t-conteudos">Conteúdos</button>
+    <button class="tab" role="tab" aria-selected="false" data-p="cruza" id="t-cruza">Produção x Ciência</button>
+    <button class="tab" role="tab" aria-selected="false" data-p="pessoas" id="t-pessoas">Pesquisadores</button>
+    <button class="tab" role="tab" aria-selected="false" data-p="produtores" id="t-produtores">Produtores</button>
+    <button class="tab" role="tab" aria-selected="false" data-p="conversa" id="t-conversa">Pergunte</button>
+    <button class="tab" role="tab" aria-selected="false" data-p="sobre" id="t-sobre">Como classificamos</button>
+  </nav>
+
+  <div class="filters" id="filters">
+    <div class="f"><label for="f-tipo">Tipo</label><select id="f-tipo"><option value="">Tudo</option><option value="M">Materiais para o campo</option><option value="P">Publicações</option><option value="J">Projetos</option><option value="S">Soluções tecnológicas</option><optgroup label="Formato da publicação"><option value="fol">Folhetos e folders</option><option value="liv">Livros e capítulos</option><option value="vid">Vídeos</option><option value="art">Artigos científicos</option><option value="eve">Trabalhos em eventos</option><option value="out">Teses, relatórios e mapas</option></optgroup></select></div>
+    <div class="f"><label for="f-nivel">Ligação com o tema</label><select id="f-nivel"><option value="">Direta e afim</option><option value="N">Só direta</option><option value="A">Só afim</option></select></div>
+    <div class="f"><label for="f-tema">Tema</label><select id="f-tema"></select></div>
+    <div class="f"><label for="f-cadeia">Cultura ou criação</label><select id="f-cadeia"></select></div>
+    <div class="f"><label for="f-produto">Produto</label><select id="f-produto"></select></div>
+    <div class="f"><label for="f-bioma">Bioma</label><select id="f-bioma"><option value="">Todos</option></select></div>
+    <div class="f"><label for="f-regiao">Região</label><select id="f-regiao"><option value="">Todas</option></select></div>
+    <div class="f"><label for="f-uf">Estado</label><select id="f-uf"><option value="">Todos</option></select></div>
+    <div class="f"><label for="f-a0">De</label><input type="number" id="f-a0" min="1975" max="2026" placeholder="ano"></div>
+    <div class="f"><label for="f-a1">Até</label><input type="number" id="f-a1" min="1975" max="2026" placeholder="ano"></div>
+    <div class="f" style="flex:1 1 180px"><label for="f-q">Buscar palavra</label><input type="search" id="f-q" placeholder="ex.: café, bokashi, quintal"></div>
+    <button class="btn" id="f-limpar">Limpar</button>
+  </div>
+
+  <section class="panel on" id="p-mapa" role="tabpanel" aria-labelledby="t-mapa">
+    <div class="grid">
+      <div class="box">
+        <div class="maptools">
+          <span>Mostrar</span>
+          <div class="seg" id="m-camada">
+            <button aria-pressed="true" data-v="conteudos">Conteúdos da Embrapa</button>
+            <button aria-pressed="false" data-v="produtores">Produtores orgânicos</button>
+          </div>
+          <div class="seg" id="m-onde" title="Onde marcar cada conteúdo">
+            <button aria-pressed="true" data-v="citado">Lugar citado</button>
+            <button aria-pressed="false" data-v="unidade">Sede da Unidade</button>
+          </div>
+          <label><input type="checkbox" id="m-biomas"> Biomas</label>
+        </div>
+        <svg id="map" viewBox="0 0 600 600" role="img" aria-label="Mapa do Brasil por estado"></svg>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="box">
+        <h2 id="side-title">Temas</h2>
+        <p class="lede" id="side-note" style="font-size:14px"></p>
+        <div class="sub">Temas centrais</div><div class="bars" id="bars-n"></div>
+        <div class="sub">Práticas de base ecológica</div><div class="bars" id="bars-p"></div>
+        <div class="sub">Por ano</div><svg id="timeline" viewBox="0 0 400 120" preserveAspectRatio="none" role="img" aria-label="Conteúdos por ano"></svg>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-conteudos" role="tabpanel" aria-labelledby="t-conteudos">
+    <div class="grid">
+      <div class="box"><h2 id="lst-title">Conteúdos</h2><div class="list" id="lst"></div><button class="btn more" id="lst-more">Mostrar mais</button></div>
+      <div class="box"><h2>Recortes</h2>
+        <div class="sub">Cultura ou criação</div><div class="bars" id="bars-k"></div>
+        <div class="sub">Contexto social</div><div class="bars" id="bars-x"></div>
+        <div class="sub">Unidades da Embrapa que mais produzem</div><div class="bars" id="bars-u"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-cruza" role="tabpanel" aria-labelledby="t-cruza">
+    <div class="box">
+      <h2>O que se produz e o que se pesquisa</h2>
+      <p class="lede" style="font-size:14px">Para cada produto: quantos produtores orgânicos o declaram (CNPO e SIGORG) e quantos conteúdos da Embrapa sobre orgânicos e agroecologia falam dele. Os filtros de lugar valem para os dois lados; tema, tipo e ano valem só para os conteúdos. A coluna "Toda a Embrapa" mostra quanto a Embrapa pesquisa o produto em qualquer sistema de produção.</p>
+      <div class="seg" id="cz-ord" style="margin-top:12px">
+        <button aria-pressed="true" data-v="prod">Ordenar por produtores</button><button aria-pressed="false" data-v="lac">Maiores lacunas</button><button aria-pressed="false" data-v="cie">Mais pesquisados</button>
+      </div>
+      <div class="sub">Cada ponto é um produto (escala logarítmica). Abaixo da linha: muita produção para pouca pesquisa orgânica.</div>
+      <svg id="scatter" viewBox="0 0 720 380" role="img" aria-label="Produtores orgânicos por conteúdos da Embrapa, por produto" style="width:100%;display:block"></svg>
+      <div class="tbl" style="margin-top:12px"><table><thead><tr><th>Produto</th><th>Grupo</th><th>Produtores orgânicos</th><th>Conteúdos orgânicos da Embrapa</th><th>Toda a Embrapa</th><th>Produtores por conteúdo</th><th>Situação</th></tr></thead><tbody id="cz"></tbody></table></div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-pessoas" role="tabpanel" aria-labelledby="t-pessoas">
+    <div class="box">
+      <h2>Pesquisadores e pesquisadoras do tema</h2>
+      <p class="lede" style="font-size:14px">Pessoas do cadastro de autores da Embrapa que assinam os conteúdos do recorte (ou lideram os projetos). Todos os filtros valem aqui. Nomes com <b>*</b> têm a mesma forma de citação de outra pessoa, então a contagem pode incluir trabalhos de um homônimo.</p>
+      <div class="tbl" style="margin-top:12px"><table><thead><tr><th>Nome</th><th>Unidade</th><th>Situação</th><th>Publicações diretas</th><th>Afins</th><th>Projetos liderados</th><th>Em execução</th><th>Período</th></tr></thead><tbody id="pes"></tbody></table></div>
+      <button class="btn more" id="pes-more">Mostrar mais</button>
+    </div>
+  </section>
+
+  <section class="panel" id="p-produtores" role="tabpanel" aria-labelledby="t-produtores">
+    <div class="grid">
+      <div class="box">
+        <h2>Municípios com produtores orgânicos</h2>
+        <p class="lede" style="font-size:14px">CNPO (Cadastro Nacional de Produtores Orgânicos, janeiro de 2026) e SIGORG. Valem os filtros de produto, bioma, região e estado. Tema, tipo e ano não se aplicam a produtores.</p>
+        <div class="tbl" style="margin-top:12px"><table><thead><tr><th>Município</th><th>Bioma</th><th id="prd-col">Total</th><th>CNPO</th><th>SIGORG</th><th>Por auditoria</th><th>Participativo</th><th>Venda direta</th><th>Principais produtos</th></tr></thead><tbody id="prd"></tbody></table></div>
+        <button class="btn more" id="prd-more">Mostrar mais</button>
+      </div>
+      <div class="box">
+        <h2>Quem garante o selo</h2>
+        <p class="lede" style="font-size:14px"><b>Certificadora</b>: empresa faz auditoria. <b>OPAC</b>: grupo de agricultores e técnicos avalia junto (sistema participativo). <b>OCS</b>: grupo de agricultores familiares que vende direto ao consumidor, sem selo.</p>
+        <div class="sub">Tipo de garantia (produtores)</div><div class="bars" id="bars-g"></div>
+        <div class="sub">Entidades com mais produtores</div>
+        <div class="tbl"><table><thead><tr><th>Entidade</th><th>Tipo</th><th>Produtores</th></tr></thead><tbody id="ent"></tbody></table></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-conversa" role="tabpanel" aria-labelledby="t-conversa">
+    <div class="box chat">
+      <h2>Pergunte em palavras simples</h2>
+      <p class="lede" style="font-size:14px" id="chat-note">As respostas saem dos mesmos dados desta página, calculadas no seu navegador, sem conta e sem enviar nada para fora. O assistente reconhece produtos, lugares, temas, tipos e períodos e ajusta o mapa e os filtros.</p>
+      <div class="sugs" id="sugs">
+        <button>O que a Embrapa tem sobre café orgânico?</button>
+        <button>Quem pesquisa agroecologia na Caatinga?</button>
+        <button>Onde há mais produtores orgânicos no Nordeste?</button>
+        <button>Quais produtos têm pouca pesquisa orgânica no Sul?</button>
+        <button>Soluções tecnológicas de compostagem</button>
+      </div>
+      <div class="chat" id="msgs"></div>
+      <form class="ask" id="ask"><input id="ask-in" placeholder="Escreva sua pergunta" autocomplete="off"><button class="btn primary" id="ask-go">Perguntar</button></form>
+    </div>
+  </section>
+
+  <section class="panel" id="p-sobre" role="tabpanel" aria-labelledby="t-sobre">
+    <div class="box prose">
+      <h2>Como classificamos</h2>
+      <p>Lemos o título, as palavras-chave e o resumo (ou a descrição) de cada publicação, projeto e solução tecnológica da Embrapa (bases de setembro de 2026) e procuramos termos de uma taxonomia em quatro grupos.</p>
+      <ul>
+        <li><b>Ligação direta</b>: o texto fala de produção orgânica, agroecologia, outras correntes de base ecológica ou certificação de orgânicos.</li>
+        <li><b>Ligação afim</b>: o texto não usa essas palavras, mas trata de duas ou mais práticas de base ecológica diferentes (por exemplo, adubação verde e controle biológico).</li>
+        <li>Textos com uma única prática ficaram de fora das contagens, mas estão guardados nas tabelas para consulta.</li>
+        <li>Expressões como "zoneamento agroecológico" foram descartadas, porque tratam de aptidão de terras e não de agroecologia.</li>
+      </ul>
+      <p><b>Lugares.</b> Um conteúdo é ligado ao município quando o texto cita "Município, UF" ou "município de ...". Estados e biomas citados também contam, e o bioma do município entra junto. A opção "Sede da Unidade" usa a cidade da Unidade da Embrapa responsável.</p>
+      <p><b>Produtos.</b> Agrupamos as atividades declaradas no CNPO e no SIGORG em 62 produtos (por exemplo, "Citros" junta laranja, limão e tangerina) e procuramos os mesmos produtos, em português, inglês e pelo nome científico, nos textos da Embrapa. Um produtor que declara vários produtos conta uma vez em cada um.</p>
+      <p><b>Pessoas.</b> Os autores das publicações foram ligados ao cadastro Autor Pessoal Embrapa pela forma de citação (ex.: "GUERRA, J. G. M."), e os líderes de projeto pelo nome completo.</p>
+      <h3>Taxonomia</h3>
+      <div class="taxo" id="taxo"></div>
+      <p class="foot">Fontes: Embrapa (publicações, projetos e soluções tecnológicas, set. 2026; Autor Pessoal Embrapa), MAPA (CNPO, jan. 2026; SIGORG), IBGE (municípios 2022 e biomas 2019, via geobr/IPEA). Os números vêm de leitura automática de texto e servem para explorar; confira o conteúdo original antes de citar.</p>
+    </div>
+  </section>
+  <p class="foot" id="foot"></p>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const fmt = n => n.toLocaleString("pt-BR");
+const norm = s => (s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+const TIPO = {P:"Publicação", J:"Projeto", S:"Solução tecnológica"};
+// formatos de publicação (campo "Tipo de publicação" da base da Embrapa); "M" junta o que serve para levar ao campo
+const FORMATO = {
+  fol: st => /^(Folhetos|Folders)$/.test(st),
+  liv: st => /^(Livros|Parte de livro)/.test(st),
+  vid: st => /^Filmes/.test(st),
+  art: st => /^Artigo de periódico|^Fascículos/.test(st),
+  eve: st => /anais|proceedings/i.test(st),
+  out: st => /^(Teses|Relatórios|Material não-convencional|Mapas)/.test(st)};
+const FORMATO_NOME = {M:"materiais para o campo", fol:"folhetos e folders", liv:"livros e capítulos", vid:"vídeos", art:"artigos científicos", eve:"trabalhos em eventos", out:"teses e relatórios"};
+function tipoOk(i, v){
+  if (!v) return true;
+  if (v === "P" || v === "J" || v === "S") return i.t === v;
+  if (v === "M") return i.t === "S" || (i.t === "P" && (FORMATO.fol(i.st) || FORMATO.liv(i.st) || FORMATO.vid(i.st)));
+  return i.t === "P" && FORMATO[v] && FORMATO[v](i.st || "");
+}
+const BIOMAS = ["Amazônia","Caatinga","Cerrado","Mata Atlântica","Pampa","Pantanal"];
+const BCOL = {"Amazônia":"--b-amz","Caatinga":"--b-caa","Cerrado":"--b-cer","Mata Atlântica":"--b-mat","Pampa":"--b-pam","Pantanal":"--b-pan"};
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+let D, TAX = {}, F = {}, view = {camada:"conteudos", onde:"citado", biomas:false}, lim = {lst:30, pes:40, prd:40};
+
+const ids = ["tipo","nivel","tema","cadeia","produto","bioma","regiao","uf","a0","a1","q"];
+function readF(){ ids.forEach(k => F[k] = $("#f-"+k).value.trim()); }
+function setF(o){ ids.forEach(k => { if (k in o) $("#f-"+k).value = o[k] ?? ""; }); readF(); render(); }
+
+function itemsF(skip){
+  const q = norm(F.q), a0 = +F.a0 || 0, a1 = +F.a1 || 9999;
+  return D.itens.filter(i =>
+    tipoOk(i, F.tipo) && (!F.nivel || i.n === F.nivel) &&
+    (!F.tema || i.c.includes(F.tema) || i.x.includes(F.tema)) &&
+    (F.cadeia === "" || i.k.includes(+F.cadeia)) &&
+    (skip==="produto" || F.produto === "" || i.pr.includes(+F.produto)) &&
+    (!F.bioma || i.b.includes(F.bioma)) &&
+    (!F.regiao || i.uf.some(u => D.ufs[u][1] === F.regiao) || (view.onde==="unidade" && D.mun[i.lu] && D.mun[i.lu][4]===F.regiao)) &&
+    (skip==="uf" || !F.uf || i.uf.includes(F.uf) || (view.onde==="unidade" && i.lu.endsWith("-"+F.uf))) &&
+    (!i.a || (i.a >= a0 && i.a <= a1)) && (!a0 && !F.a1 || i.a) &&
+    (!q || norm(i.ti + " " + i.au + " " + i.u).includes(q)));
+}
+// produtores: seguem só os filtros de lugar (bioma, região, estado), produto e busca por município
+const nProd = (p, k = F.produto) => k === "" || k == null ? p.cn + p.sg : (p.pc[k] || 0);
+function prodF(k = F.produto){
+  return D.prod.filter(p => (!F.bioma || p.b === F.bioma) && (!F.regiao || p.rg === F.regiao) && (!F.uf || p.uf === F.uf) && (!F.q || norm(p.id+" "+p.pp).includes(norm(F.q))) && nProd(p, k) > 0);
+}
+const totProd = (k = F.produto) => prodF(k).reduce((s,p)=>s+nProd(p,k),0);
+// pesquisadores: contados a partir dos conteúdos que passam em todos os filtros
+function pesF(items = itemsF()){
+  const m = new Map();
+  for (const i of items) for (const k of i.ps){
+    let r = m.get(k); if (!r){ r = {...D.pes[k], pn:0, pa:0, pj:0, pe:0, a0:null, a1:null}; m.set(k, r); }
+    if (i.t === "P"){ i.n === "N" ? r.pn++ : r.pa++; } else if (i.t === "J"){ r.pj++; if (i.st === "em execução") r.pe++; }
+    if (i.a){ r.a0 = r.a0 ? Math.min(r.a0, i.a) : i.a; r.a1 = r.a1 ? Math.max(r.a1, i.a) : i.a; }
+  }
+  return [...m.values()].sort((a,b)=>b.pn*2+b.pa+b.pj*5-(a.pn*2+a.pa+a.pj*5));
+}
+
+/* ---------- mapa ---------- */
+let proj, path, gBio, gUf, gDot;
+function initMap(est, bio){
+  const svg = d3.select("#map");
+  proj = d3.geoMercator().fitExtent([[10,10],[590,590]], est);
+  path = d3.geoPath(proj);
+  const root = svg.append("g");
+  gBio = root.append("g"); gUf = root.append("g"); gDot = root.append("g");
+  gBio.selectAll("path").data(bio.features).join("path").attr("class","bio").attr("d",path).attr("fill",d=>css(BCOL[d.properties.name_biome])||"none").attr("hidden",true);
+  gUf.selectAll("path").data(est.features).join("path").attr("class","uf").attr("d",path)
+    .on("click",(e,d)=>{ $("#f-uf").value = F.uf===d.properties.uf ? "" : d.properties.uf; readF(); render(); })
+    .on("mousemove",(e,d)=>tip(e, ufTip(d.properties.uf))).on("mouseleave",()=>tip());
+  svg.call(d3.zoom().scaleExtent([1,12]).on("zoom",e=>{ root.attr("transform",e.transform); gDot.selectAll("circle").attr("r",function(){return this.dataset.r/Math.sqrt(e.transform.k)}).attr("stroke-width",.6/e.transform.k); }));
+}
+let ufCount = {};
+function ufTip(uf){
+  const [nome] = D.ufs[uf]; const v = ufCount[uf]||0;
+  return `<b>${nome}</b><br>${fmt(v)} ${view.camada==="conteudos" ? "conteúdos" : "produtores"}<br><small>Clique para filtrar</small>`;
+}
+function tip(e, html){
+  const t = $("#tip"); if (!e){ t.hidden = true; return; }
+  t.innerHTML = html; t.hidden = false;
+  const x = Math.min(e.clientX+14, innerWidth-t.offsetWidth-8); t.style.left = x+"px"; t.style.top = (e.clientY+14)+"px";
+}
+function drawMap(items){
+  const conteudo = view.camada === "conteudos";
+  ufCount = {}; const pts = {};
+  if (conteudo){
+    for (const i of items){
+      const locs = view.onde === "citado" ? i.m : (i.lu ? [i.lu] : []);
+      const ufs = view.onde === "citado" ? i.uf : (i.lu ? [i.lu.split("-").pop()] : []);
+      ufs.forEach(u => ufCount[u] = (ufCount[u]||0)+1);
+      locs.forEach(m => pts[m] = (pts[m]||0)+1);
+    }
+  } else {
+    for (const p of prodF()){ const n = nProd(p); ufCount[p.uf] = (ufCount[p.uf]||0)+n; pts[p.id] = {n, p}; }
+  }
+  const max = d3.max(Object.values(ufCount)) || 1;
+  const base = conteudo ? css("--green") : css("--ochre");
+  const sc = d3.scaleSqrt().domain([0,max]).range([0.08,0.85]);
+  gUf.selectAll("path").attr("fill", d => { const v = ufCount[d.properties.uf]||0; if (view.biomas) return "transparent"; if (!v) return css("--map-empty"); const c = d3.color(base); c.opacity = sc(v); return c+""; })
+    .classed("sel", d => d.properties.uf === F.uf);
+  gBio.selectAll("path").attr("hidden", view.biomas ? null : true).attr("fill", d=>css(BCOL[d.properties.name_biome])||"none");
+  const arr = Object.entries(pts).map(([id,v]) => { const n = typeof v==="number" ? v : v.n; const ll = typeof v==="number" ? D.mun[id] : [v.p.la, v.p.lo]; return ll ? {id,n,ll,p:v.p} : null; }).filter(Boolean).sort((a,b)=>b.n-a.n);
+  const pm = d3.max(arr, d=>d.n) || 1; const r = d3.scaleSqrt().domain([0,pm]).range([1.5, conteudo ? 14 : 18]);
+  gDot.selectAll("circle").data(arr, d=>d.id).join("circle").attr("class","dot")
+    .attr("cx", d=>proj([d.ll[1], d.ll[0]])[0]).attr("cy", d=>proj([d.ll[1], d.ll[0]])[1])
+    .attr("r", d=>r(d.n)).attr("data-r", d=>r(d.n))
+    .attr("fill", conteudo ? css("--ink") : css("--ochre")).attr("fill-opacity", .7)
+    .on("mousemove",(e,d)=>tip(e, `<b>${d.id}</b><br>${fmt(d.n)} ${conteudo ? "conteúdos" : "produtores"}` + (d.p ? `<br>${d.p.pp.replaceAll("-"," ")}` : "")))
+    .on("mouseleave",()=>tip())
+    .on("click",(e,d)=>{ if (conteudo){ $("#f-q").value=""; setF({uf:d.id.split("-").pop()}); showTab("conteudos"); } });
+  const lg = $("#legend");
+  lg.innerHTML = view.biomas ? BIOMAS.map(b=>`<span><i class="sw" style="background:var(${BCOL[b]})"></i>${b}</span>`).join("")
+    : `<span><i class="sw" style="background:${base}"></i>cor do estado: quanto mais forte, mais ${conteudo?"conteúdos":"produtores"}</span><span><i class="sw" style="background:${conteudo?css("--ink"):base};border-radius:50%"></i>círculo: ${conteudo ? (view.onde==="citado"?"município citado no texto":"cidade da Unidade da Embrapa") : "produtores no município"}</span>`;
+  $("#m-onde").hidden = !conteudo;
+}
+
+/* ---------- gráficos ---------- */
+function bars(el, rows, cls, onClick, selKey){
+  const max = d3.max(rows, r=>r.v) || 1;
+  el.innerHTML = rows.map(r => `<button class="bar ${cls||""} ${r.k===selKey?"sel":""}" data-k="${r.k}" title="${r.label}"><span>${r.label}</span><i style="width:${Math.max(2,r.v/max*100)}%"></i><em>${fmt(r.v)}</em></button>`).join("");
+  if (onClick) el.querySelectorAll(".bar").forEach(b => b.onclick = () => onClick(b.dataset.k));
+}
+function countBy(items, f){ const c = {}; for (const i of items) for (const k of f(i)) c[k]=(c[k]||0)+1; return c; }
+function timeline(items){
+  const c = countBy(items, i => i.a ? [i.a] : []); const anos = d3.range(1990, 2027);
+  const max = d3.max(anos, a=>c[a]||0)||1; const w = 400/anos.length;
+  const svg = d3.select("#timeline"); svg.selectAll("*").remove();
+  svg.selectAll("rect").data(anos).join("rect").attr("x",(a,k)=>k*w+1).attr("width",w-2).attr("y",a=>104-(c[a]||0)/max*96).attr("height",a=>(c[a]||0)/max*96).attr("fill",css("--green")).append("title").text(a=>`${a}: ${c[a]||0}`);
+  svg.append("line").attr("x1",0).attr("x2",400).attr("y1",104).attr("y2",104).attr("stroke",css("--line"));
+  [1990,2000,2010,2020].forEach(a=>svg.append("text").attr("x",(a-1990)*w).attr("y",118).attr("font-size",10).attr("fill",css("--muted")).text(a));
+}
+
+/* ---------- render ---------- */
+function render(){
+  const items = itemsF();
+  const ativos = ids.filter(k=>F[k]).length;
+  $("#kpis").innerHTML = [
+    [items.filter(i=>i.t==="P").length,"publicações"],[items.filter(i=>i.t==="J").length,"projetos"],[items.filter(i=>i.t==="S").length,"soluções tecnológicas"],
+    [pesF(items).length,"pesquisadores"],[totProd(),"produtores orgânicos"+(F.produto!==""?" de "+D.produtos[+F.produto].nome.toLowerCase():"")]
+  ].map(([v,l])=>`<div class="kpi"><b>${fmt(v)}</b><span>${l}${ativos?" no recorte":""}</span></div>`).join("");
+  drawMap(items);
+  const tc = countBy(items, i=>i.c);
+  const pick = k => { $("#f-tema").value = F.tema===k ? "" : k; readF(); render(); };
+  bars($("#bars-n"), D.tax.filter(t=>t.eixo==="nucleo").map(t=>({k:t.id,label:t.nome,v:tc[t.id]||0})), "", pick, F.tema);
+  bars($("#bars-p"), D.tax.filter(t=>t.eixo==="pratica").map(t=>({k:t.id,label:t.nome,v:tc[t.id]||0})).sort((a,b)=>b.v-a.v), "pr", pick, F.tema);
+  $("#side-note").textContent = `${fmt(items.length)} conteúdos no recorte. Clique num tema para filtrar.`;
+  timeline(items);
+  // lista
+  const ord = items.slice().sort((a,b)=>(b.n==="N")-(a.n==="N") || (b.a||0)-(a.a||0));
+  $("#lst-title").textContent = `${fmt(items.length)} conteúdos`;
+  $("#lst").innerHTML = ord.slice(0,lim.lst).map(i=>`<div class="item"><a href="${i.url}" target="_blank" rel="noopener">${esc(i.ti)}</a>
+    <div class="meta"><span class="tag ${i.n==="N"?"n":"a"}">${i.n==="N"?"direto":"afim"}</span><span>${TIPO[i.t]} · ${esc(i.st||"")}</span><span>${i.a||""}</span><span>Embrapa ${esc(i.u)}</span>${i.m.length?`<span>Local: ${i.m.slice(0,4).join(", ")}</span>`:""}${i.b.length?`<span>${i.b.join(", ")}</span>`:""}</div>
+    <div class="meta">${i.c.map(c=>`<span class="tag">${TAX[c]}</span>`).join("")}</div></div>`).join("") || `<p class="lede">Nada encontrado com esses filtros.</p>`;
+  $("#lst-more").hidden = items.length <= lim.lst;
+  const cad = countBy(items, i=>i.k);
+  bars($("#bars-k"), D.cad.map((n,k)=>({k:String(k),label:n,v:cad[k]||0})).sort((a,b)=>b.v-a.v), "pr", k=>{ $("#f-cadeia").value = F.cadeia===k?"":k; readF(); render(); }, F.cadeia);
+  const xc = countBy(items, i=>i.x);
+  bars($("#bars-x"), D.tax.filter(t=>t.eixo==="contexto").map(t=>({k:t.id,label:t.nome,v:xc[t.id]||0})).sort((a,b)=>b.v-a.v), "", pick, F.tema);
+  const uc = countBy(items, i=>[i.u]);
+  bars($("#bars-u"), Object.entries(uc).sort((a,b)=>b[1]-a[1]).slice(0,12).map(([k,v])=>({k,label:k,v})), "");
+  // pessoas
+  const ps = pesF(items);
+  $("#pes").innerHTML = ps.slice(0,lim.pes).map(p=>`<tr><td>${esc(p.nome)}${p.h?" *":""}</td><td>${esc(p.af)}</td><td>${p.at?"Ativo":"Inativo"}</td><td class="num">${p.pn}</td><td class="num">${p.pa}</td><td class="num">${p.pj}</td><td class="num">${p.pe}</td><td>${p.a0?p.a0+"–"+p.a1:""}</td></tr>`).join("");
+  $("#pes-more").hidden = ps.length <= lim.pes;
+  // produtores
+  const pr = prodF().sort((a,b)=>nProd(b)-nProd(a));
+  $("#prd-col").textContent = F.produto!=="" ? D.produtos[+F.produto].nome : "Total";
+  $("#prd").innerHTML = pr.slice(0,lim.prd).map(p=>`<tr><td>${p.id}</td><td>${p.b||""}</td><td class="num"><b>${fmt(nProd(p))}</b></td><td class="num">${fmt(p.cn)}</td><td class="num">${fmt(p.sg)}</td><td class="num">${fmt(p.ce)}</td><td class="num">${fmt(p.op)}</td><td class="num">${fmt(p.oc)}</td><td>${esc(p.pp.replaceAll("-"," "))}</td></tr>`).join("");
+  $("#prd-more").hidden = pr.length <= lim.prd;
+  bars($("#bars-g"), [["ce","Certificadora (auditoria)"],["op","OPAC (participativo)"],["oc","OCS (venda direta)"]].map(([k,l])=>({k,label:l,v:pr.reduce((s,p)=>s+p[k],0)})), "pr");
+  const ufsSel = new Set(pr.map(p=>p.uf));
+  cruza();
+  $("#ent").innerHTML = D.ent.filter(e=>!F.uf && !F.regiao && !F.bioma || e.uf.split(";").some(u=>ufsSel.has(u))).slice(0,15).map(e=>`<tr><td>${esc(e.e)}</td><td>${e.tp.split(" ")[0]}</td><td class="num">${fmt(e.p)}</td></tr>`).join("");
+}
+let czOrd = "prod";
+function cruza(){
+  const items = itemsF("produto");
+  const cont = countBy(items, i=>i.pr);
+  const rows = D.produtos.map((p,k)=>({k, ...p, prod: totProd(String(k)), cie: cont[k]||0})).filter(r=>r.prod>0 || r.cie>0);
+  rows.forEach(r=>r.raz = r.prod/Math.max(1,r.cie));
+  const med = d3.median(rows.filter(r=>r.prod>0), r=>r.raz) || 1;
+  rows.forEach(r=>r.sit = r.prod===0 ? ["mu","Sem produtores no recorte"] : r.raz > med*3 ? ["lac","Pouca pesquisa orgânica"] : r.raz < med/3 ? ["ok","Muita pesquisa"] : ["mu","Equilibrado"]);
+  const ord = {prod:(a,b)=>b.prod-a.prod, lac:(a,b)=>b.raz-a.raz || b.prod-a.prod, cie:(a,b)=>b.cie-a.cie}[czOrd];
+  rows.sort(ord);
+  const mp = d3.max(rows,r=>r.prod)||1, mc = d3.max(rows,r=>r.cie)||1;
+  $("#cz").innerHTML = rows.map(r=>`<tr data-k="${r.k}" class="${String(r.k)===F.produto?"sel":""}"><td>${esc(r.nome)}</td><td>${esc(r.grupo)}</td>
+    <td><div class="bi"><span class="num" style="font-family:var(--f-mono);font-size:13px">${fmt(r.prod)}</span><i style="width:${r.prod/mp*100}%;background:var(--ochre)"></i></div></td>
+    <td><div class="bi"><span class="num" style="font-family:var(--f-mono);font-size:13px">${fmt(r.cie)}</span><i style="width:${r.cie/mc*100}%;background:var(--green)"></i></div></td>
+    <td class="num">${fmt(r.embrapa)}</td><td class="num">${r.prod?fmt(Math.round(r.raz)):"–"}</td><td><span class="st ${r.sit[0]}">${r.sit[1]}</span></td></tr>`).join("");
+  document.querySelectorAll("#cz tr").forEach(tr=>tr.onclick=()=>{ $("#f-produto").value = F.produto===tr.dataset.k ? "" : tr.dataset.k; readF(); render(); });
+  // dispersão
+  const svg = d3.select("#scatter"); svg.selectAll("*").remove();
+  const W=720,H=380,m={l:56,r:16,t:12,b:40};
+  const pts = rows.filter(r=>r.prod>0);
+  const x = d3.scaleLog().domain([1, Math.max(10,d3.max(pts,r=>r.prod))]).range([m.l,W-m.r]).nice();
+  const y = d3.scaleLog().domain([1, Math.max(10,d3.max(pts,r=>r.cie+1))]).range([H-m.b,m.t]).nice();
+  const ink = css("--muted"), line = css("--line");
+  const tk = sc => [1,2,5,10,20,50,100,200,500,1000,2000,5000,10000,20000,50000].filter(t=>t>=sc.domain()[0]&&t<=sc.domain()[1]);
+  tk(x).forEach(t=>{ svg.append("line").attr("x1",x(t)).attr("x2",x(t)).attr("y1",m.t).attr("y2",H-m.b).attr("stroke",line); svg.append("text").attr("x",x(t)).attr("y",H-m.b+14).attr("text-anchor","middle").attr("font-size",11).attr("fill",ink).text(d3.format("~s")(t)); });
+  tk(y).forEach(t=>{ svg.append("line").attr("x1",m.l).attr("x2",W-m.r).attr("y1",y(t)).attr("y2",y(t)).attr("stroke",line); svg.append("text").attr("x",m.l-6).attr("y",y(t)+4).attr("text-anchor","end").attr("font-size",11).attr("fill",ink).text(d3.format("~s")(t)); });
+  svg.append("text").attr("x",W-m.r).attr("y",H-6).attr("text-anchor","end").attr("font-size",12).attr("fill",ink).text("produtores orgânicos →");
+  svg.append("text").attr("x",m.l).attr("y",m.t+10).attr("x",m.l+6).attr("font-size",12).attr("fill",ink).text("↑ conteúdos orgânicos da Embrapa (+1)");
+  // linha de referência: razão mediana
+  const x0 = x.domain()[0], x1 = x.domain()[1];
+  if (pts.length > 1 && isFinite(med)) svg.append("line").attr("x1",x(x0)).attr("y1",y(Math.max(1,x0/med))).attr("x2",x(x1)).attr("y2",y(Math.min(y.domain()[1], x1/med))).attr("stroke",ink).attr("stroke-dasharray","4 4");
+  const lab = new Set(pts.slice().sort((a,b)=>b.raz-a.raz).slice(0,3).concat(pts.slice().sort((a,b)=>b.prod-a.prod).slice(0,3), pts.slice().sort((a,b)=>b.cie-a.cie).slice(0,3)).map(r=>r.k));
+  const g = svg.selectAll("g.pt").data(pts).join("g").attr("class","pt").style("cursor","pointer").on("click",(e,r)=>{ $("#f-produto").value = F.produto===String(r.k)?"":String(r.k); readF(); render(); })
+    .on("mousemove",(e,r)=>tip(e,`<b>${r.nome}</b><br>${fmt(r.prod)} produtores · ${fmt(r.cie)} conteúdos orgânicos<br>${fmt(r.embrapa)} conteúdos na Embrapa toda`)).on("mouseleave",()=>tip());
+  g.append("circle").attr("cx",r=>x(r.prod)).attr("cy",r=>y(r.cie+1)).attr("r",r=>String(r.k)===F.produto?7:5)
+    .attr("fill",r=>r.sit[0]==="lac"?css("--ochre"):r.sit[0]==="ok"?css("--green"):css("--muted")).attr("fill-opacity",.85).attr("stroke",css("--surface"));
+  g.filter(r=>lab.has(r.k)||String(r.k)===F.produto).append("text").attr("x",r=>x(r.prod)+7).attr("y",r=>y(r.cie+1)+4).attr("font-size",10).attr("fill",css("--ink")).attr("paint-order","stroke").attr("stroke",css("--surface")).attr("stroke-width",3).text(r=>r.nome.split(" (")[0]);
+}
+const esc = s => String(s??"").replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function showTab(p){
+  document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected", t.dataset.p===p));
+  document.querySelectorAll(".panel").forEach(s=>s.classList.toggle("on", s.id==="p-"+p));
+  $("#filters").hidden = p==="sobre" || p==="conversa";
+}
+
+function comFiltros(input, fn){
+  const salvo = {...F}; ids.forEach(k => F[k] = input[k]!==undefined && input[k]!==null ? String(input[k]) : "");
+  try { return fn(); } finally { Object.assign(F, salvo); }
+}
+/* ---------- conversa (intérprete aberto, roda no navegador, sem conta) ---------- */
+const PARE = new Set("a o as os e de da do das dos em no na nos nas um uma uns umas para por com sem que qual quais quem como onde quando quanto quantos quantas mais menos muito muita sobre tem ha existe existem embrapa me mostre mostra mostrar quero saber pesquisa pesquisas pesquisar pesquisam pesquisou estudos estudo trabalhos trabalho conteudo conteudos coisa coisas organico organicos organica organicas producao produtos produto produzir produz produzem tudo isso esse essa este esta brasil pais ja se ao aos lugar lugares regiao regioes estado estados bioma biomas sao foi foram ser servem serve ajuda pode podem existe algum alguma voce unidade unidades trabalham trabalha trabalhar centro centros".split(" "));
+const PREP_UF = {AC:"no",AL:"em",AP:"no",AM:"no",BA:"na",CE:"no",DF:"no",ES:"no",GO:"em",MA:"no",MT:"em",MS:"em",MG:"em",PA:"no",PB:"na",PR:"no",PE:"em",PI:"no",RJ:"no",RN:"no",RS:"no",RO:"em",RR:"em",SC:"em",SP:"em",SE:"em",TO:"no"};
+const ALIAS_EXTRA = {"Café":["cafe","cafeicultura"],"Mel e produtos das abelhas":["mel","abelha","abelhas","apicultura","meliponicultura"],"Ovos e frango":["ovo","ovos","frango","frangos","galinha","galinhas","avicultura"],"Leite e derivados":["leite","queijo","laticinios"],"Carne bovina":["boi","gado de corte","carne bovina","pecuaria de corte"],"Mandioca":["aipim","macaxeira"],"Cana-de-açúcar, açúcar e rapadura":["cana","acucar","rapadura","melado"],"Uva e vinho":["uva","uvas","vinho","vinhos","videira"],"Peixes":["peixe","tilapia","tambaqui","piscicultura"],"Suínos":["porco","porcos","suino","suinos","suinocultura"],"Citros (laranja, limão, tangerina)":["citros","laranja","limao","tangerina","mexerica","bergamota"],"Plantas medicinais e aromáticas":["plantas medicinais","medicinais","aromaticas","ervas"],"Cheiro-verde (cebolinha, coentro, salsa)":["cheiro verde","cebolinha","coentro","salsa","salsinha"],"Frutas de clima temperado (pêssego, ameixa, caqui, maçã)":["pessego","ameixa","caqui","maca","frutas de clima temperado"],"Frutas nativas (jabuticaba, pitanga, umbu, cajá, butiá, araçá)":["frutas nativas","jabuticaba","pitanga","umbu","caja","butia","araca"],"Pequi, baru e buriti":["pequi","baru","buriti"],"Castanha-do-brasil":["castanha","castanha do brasil","castanha do para"],"Trigo e cereais de inverno":["trigo","aveia","cevada"],"Outras folhosas (espinafre, almeirão, acelga, agrião)":["espinafre","almeirao","acelga","agriao"],"Brócolis e couve-flor":["brocolis","couve flor"],"Pimentão e pimentas":["pimentao","pimenta","pimentas"],"Abóbora e abobrinha":["abobora","abobrinha","jerimum"],"Berinjela e jiló":["berinjela","jilo"],"Chuchu e maxixe":["chuchu","maxixe"],"Feijão-vagem e ervilha":["vagem","feijao vagem","ervilha"],"Cebola e alho":["cebola","alho"],"Inhame e taro":["inhame","taro"],"Gengibre e açafrão":["gengibre","acafrao","curcuma"],"Melancia e melão":["melancia","melao"]};
+const TEMA_KW = [["N3","biodinamic|permacultur|agricultura natural|agricultura regenerativa"],["N4","certifica|selo|\\bspg\\b|\\bopac\\b|\\bocs\\b|participativo de garantia"],
+  ["P1","adubacao verde|adubos? verdes?|plantas? de cobertura"],["P2","compost|biofertiliz|bokashi|humus"],["P3","controle biologico|bioinsumo|inimigos? naturais|biocontrole"],["P4","calda|extrato|homeopat|fitoterap"],
+  ["P5","agroflorest|\\bsafs?\\b|sistemas? agroflorest"],["P6","fixacao biologica|inoculante|micorriz"],["P7","po de rocha|remineraliz|rochagem"],["P8","consorci|rotacao|quintais?|manejo ecologico|diversifica"],
+  ["C1","agricultura familiar|agricultores? familiares|assentament|reforma agraria"],["C2","indigena|quilombol|ribeirinh|extrativis|comunidades? tradiciona|povos? tradiciona"],["C3","sementes? crioul|guardi|bancos? de sementes|conhecimento tradicional"],
+  ["C4","feira|mercado|merenda|alimentacao escolar|\\bpnae\\b|\\bpaa\\b|comercializa|venda direta|consumidor"],["C5","participativ|extensao|\\bater\\b|assistencia tecnica|dia de campo"],["C6","mulher|juventude|jovens|urbana|periurbana|horta comunitaria|horta escolar"],["N2","agroecolog"]];
+const BIO_KW = {"Amazônia":"amazoni","Caatinga":"caatinga|semiarido|semi arido","Cerrado":"cerrado","Mata Atlântica":"mata atlantica","Pampa":"pampa","Pantanal":"pantanal"};
+let ALIASES = [], ESTADOS_N = [];
+function prepConversa(){
+  D.produtos.forEach((p,k)=>{
+    const base = norm(p.nome).replace(/[()]/g," ").split(/,| e |\s{2,}/).map(s=>s.trim()).filter(s=>s && !["outras folhosas","produtos das abelhas"].includes(s));
+    [...new Set([...base, ...(ALIAS_EXTRA[p.nome]||[])])].forEach(a=>ALIASES.push([a.replace(/-/g," "), String(k)]));
+  });
+  ALIASES.sort((a,b)=>b[0].length-a[0].length);
+  ESTADOS_N = Object.entries(D.ufs).map(([uf,[nome]])=>[norm(nome).replace(/-/g," "), uf]).sort((a,b)=>b[0].length-a[0].length);
+}
+function interpretar(pergunta){
+  const bruto = " "+pergunta+" ";
+  let t = " "+norm(pergunta).replace(/[?!.,;:"]/g," ").replace(/-/g," ").replace(/\s+/g," ")+" ";
+  const f = Object.fromEntries(ids.map(k=>[k,""])), achou = [];
+  const tira = rx => { t = t.replace(rx, " "); };
+  // estados (Pará só com acento ou sigla)
+  for (const [n, uf] of ESTADOS_N){
+    if (uf === "PA" && !/(^|[^\wÀ-ú])(pará|PA)([^\wÀ-ú]|$)/.test(bruto) && !/(^|[^\wÀ-ú])Pará/i.test(bruto)) continue;
+    const rx = new RegExp(`\\b${n}\\b`); if (rx.test(t)){ f.uf = uf; tira(rx); break; }
+  }
+  if (!f.uf){ const m = bruto.match(/\b([A-Z]{2})\b/g); if (m) for (const s of m) if (D.ufs[s]){ f.uf = s; break; } }
+  for (const [b, rx] of Object.entries(BIO_KW)) if (new RegExp(rx).test(t)){ f.bioma = b; tira(new RegExp(rx+"\\w*","g")); break; }
+  for (const [r, rx] of [["Nordeste","\\bnordest\\w*"],["Centro-Oeste","\\bcentro oeste\\b"],["Sudeste","\\bsudeste\\b"],["Norte","\\b(regiao norte|no norte|do norte)\\b"],["Sul","\\b(regiao sul|no sul|do sul)\\b"]])
+    if (!f.uf && new RegExp(rx).test(t)){ f.regiao = r; tira(new RegExp(rx,"g")); break; }
+  for (const [a, k] of ALIASES){ const rx = new RegExp(`\\b${a}s?\\b`); if (rx.test(t)){ f.produto = k; tira(rx); break; } }
+  for (const [id, rx] of TEMA_KW){ const r = new RegExp(rx); if (r.test(t)){ f.tema = id; tira(new RegExp("\\S*("+rx+")\\S*","g")); break; } }
+  if (/\b(materia(l|is)|cartilhas?|folhetos?|folders?|manuais|manual)\b/.test(t)) f.tipo = "M";
+  else if (/\b(videos?|filmes?)\b/.test(t)) f.tipo = "vid";
+  else if (/\blivros?\b/.test(t)) f.tipo = "liv";
+  else if (/\b(publica\w*|artigos?)\b/.test(t)) f.tipo = "P";
+  else if (/\bprojetos?\b/.test(t)) f.tipo = "J";
+  else if (/\b(solu\w*|tecnologias?|cultivar\w*|praticas? agropecuarias?)\b/.test(t)) f.tipo = "S";
+  tira(/\b(publica\w*|artigos?|livros?|cartilhas?|folhetos?|folders?|materia(l|is)|manua(l|is)|videos?|filmes?|projetos?|solu\w*|tecnologi\w*)\b/g);
+  let m;
+  if ((m = t.match(/entre (\d{4}) e (\d{4})/))){ f.a0 = m[1]; f.a1 = m[2]; }
+  else { if ((m = t.match(/(desde|a partir de|depois de|apos) (\d{4})/))) f.a0 = m[2];
+         if ((m = t.match(/(ate|antes de) (\d{4})/))) f.a1 = m[2];
+         if ((m = t.match(/ultimos (\d+) anos/))) f.a0 = String(2026 - +m[1]);
+         if (!f.a0 && !f.a1 && (m = t.match(/\bem (\d{4})\b/))){ f.a0 = m[1]; f.a1 = m[1]; } }
+  tira(/\d{4}|ultimos \d+ anos/g);
+  if (/\bdiretamente\b|\bso (de )?organic/.test(t)) f.nivel = "N";
+  const q = norm(pergunta);
+  const intencao = /\b(ajuda|como funciona|o que (voce|vc) (faz|sabe))\b/.test(q) ? "ajuda"
+    : /\b(lacuna|falta|faltam|pouca pesquisa|pouco pesquisad|comparar|compara|producao x|x ciencia|mais pesquisad|menos pesquisad|gargalo)\b/.test(q) ? "lacunas"
+    : /\b(quem|pesquisador\w*|especialista\w*|autor\w*|cientista\w*|contato)\b/.test(q) ? "pessoas"
+    : /\b(produtor\w*|quantos produz|onde (se )?produz|certificad\w*|agricultores? organic\w*)\b/.test(q) ? "produtores"
+    : /\b(unidades?|centros?)\b/.test(q) ? "unidades" : "conteudos";
+  const sobra = t.split(" ").filter(w => w.length > 3 && !PARE.has(w) && !/^(pesquisador|produtor|especialista|lacuna|compar|quem|onde|quais|quantos)/.test(w));
+  return {f, intencao, sobra};
+}
+function descrever(f){
+  const p = [];
+  if (f.produto !== "") p.push(D.produtos[+f.produto].nome.toLowerCase().split(" (")[0]);
+  if (f.tema) p.push(TAX[f.tema].toLowerCase());
+  const lugar = f.uf ? `${PREP_UF[f.uf]||"em"} ${D.ufs[f.uf][0]}` : f.regiao ? `na região ${f.regiao}` : "";
+  const bio = f.bioma ? `no bioma ${f.bioma}` : "";
+  const anos = f.a0 && f.a1 ? (f.a0===f.a1 ? `em ${f.a0}` : `entre ${f.a0} e ${f.a1}`) : f.a0 ? `desde ${f.a0}` : f.a1 ? `até ${f.a1}` : "";
+  return {tema: p.join(" e "), lugar: [lugar, bio].filter(Boolean).join(", "), anos};
+}
+const plural = (n, s, p) => `${fmt(n)} ${n === 1 ? s : p}`;
+const lista = arr => arr.length <= 1 ? arr.join("") : arr.slice(0,-1).join(", ") + " e " + arr[arr.length-1];
+function link(i){ return `<li><a href="${i.url}" target="_blank" rel="noopener">${esc(i.ti)}</a> <span class="meta">${i.t==="P"&&i.st?esc(i.st):TIPO[i.t]}, ${i.a||"s/ano"}, Embrapa ${esc(i.u)}</span></li>`; }
+function responder(pergunta){
+  const {f, intencao, sobra} = interpretar(pergunta);
+  if (intencao === "ajuda") return {html: `Eu leio sua pergunta procurando <b>produto</b> (café, banana, mel…), <b>lugar</b> (estado, região ou bioma), <b>tema</b> (agroecologia, compostagem, sementes…), <b>tipo</b> (publicação, projeto, solução) e <b>período</b> ("desde 2015"). Depois respondo com os números desta página e ajusto o mapa. Funciona melhor com perguntas curtas, como "Quem pesquisa mel na Caatinga?".`};
+  const d = descrever(f);
+  let usarQ = "";
+  const aplicar = () => comFiltros({...f, q: usarQ}, () => ({items: itemsF(), itemsSemProd: itemsF("produto")}));
+  let {items} = aplicar();
+  // palavras que sobraram: tenta refinar pela busca de texto
+  if (sobra.length && intencao !== "produtores" && intencao !== "lacunas"){
+    const cand = sobra.map(w => [w, items.filter(i => new RegExp("\\b"+w).test(norm(i.ti))).length]).filter(([,n]) => n > 0).sort((a,b)=>a[1]-b[1]);
+    if (cand.length){ usarQ = cand[0][0]; items = aplicar().items; }
+  }
+  const nada = !Object.values(f).some(Boolean) && !usarQ;
+  const recorte = [d.tema && `sobre ${d.tema}`, usarQ && `com "${usarQ}" no título`, d.lugar, d.anos].filter(Boolean).join(", ");
+  let html = "", camada = "conteudos";
+  if (intencao === "produtores"){
+    camada = "produtores";
+    const r = comFiltros({...f, q:""}, () => { const pr = prodF().map(p=>({id:p.id, n:nProd(p), ce:p.ce, op:p.op, oc:p.oc})).sort((a,b)=>b.n-a.n); return {pr, tot: totProd()}; });
+    const qual = f.produto !== "" ? `de ${d.tema}` : "";
+    if (!r.tot) html = `Não encontrei produtores orgânicos ${qual} ${d.lugar} no CNPO nem no SIGORG.`;
+    else {
+      html = `Há <b>${plural(r.tot, "produtor orgânico", "produtores orgânicos")}</b> ${qual} ${d.lugar || "no Brasil"}, em ${plural(r.pr.length, "município", "municípios")}. Os municípios com mais produtores são ${lista(r.pr.slice(0,5).map(p=>`${p.id} (${fmt(p.n)})`))}.`;
+      if (f.produto === ""){ const s = k => r.pr.reduce((a,p)=>a+p[k],0); html += ` Pelo tipo de garantia: ${fmt(s("ce"))} por certificadora, ${fmt(s("op"))} em sistema participativo e ${fmt(s("oc"))} com venda direta (OCS).`; }
+      const ci = comFiltros({...f, q:""}, () => itemsF().length);
+      html += ` Para comparar, a Embrapa tem ${plural(ci, "conteúdo", "conteúdos")} sobre orgânicos e agroecologia nesse mesmo recorte.`;
+    }
+  } else if (intencao === "pessoas"){
+    const ps = pesF(items);
+    if (!ps.length) html = `Não encontrei pesquisadores da Embrapa com conteúdos ${recorte}. Tente tirar um dos filtros, como o lugar ou o período.`;
+    else html = `Encontrei <b>${plural(ps.length, "pessoa", "pessoas")}</b> que assinam conteúdos ${recorte || "sobre orgânicos e agroecologia"}. As que mais aparecem:<ul>${ps.slice(0,6).map(p=>`<li><b>${esc(p.nome)}</b>${p.h?" *":""}, ${esc(p.af)} (${p.at?"ativo":"inativo"}): ${plural(p.pn+p.pa, "publicação", "publicações")}${p.pj?`, ${plural(p.pj,"projeto liderado","projetos liderados")}`:""}</li>`).join("")}</ul>A lista completa está na aba Pesquisadores.${ps.slice(0,6).some(p=>p.h)?" O * indica nome de citação igual ao de outra pessoa.":""}`;
+  } else if (intencao === "lacunas"){
+    const rows = comFiltros({...f, produto:"", q:""}, () => { const it = itemsF(), c = countBy(it, i=>i.pr); return D.produtos.map((p,k)=>({nome:p.nome.split(" (")[0], k:String(k), prod: totProd(String(k)), cie: c[k]||0})).filter(r=>r.prod>0); });
+    rows.forEach(r=>r.raz = r.prod/Math.max(1,r.cie));
+    if (f.produto !== ""){
+      const r = rows.find(x=>x.k===f.produto) || {prod:0, cie:0, raz:0};
+      const med = d3.median(rows, x=>x.raz) || 1;
+      html = `${[d.tema[0].toUpperCase()+d.tema.slice(1), d.lugar].filter(Boolean).join(" ")}: ${plural(r.prod, "produtor orgânico", "produtores orgânicos")} e ${plural(r.cie, "conteúdo orgânico", "conteúdos orgânicos")} da Embrapa. São ${fmt(Math.round(r.raz))} produtores para cada conteúdo, ${r.raz > med*3 ? "bem acima" : r.raz < med/3 ? "bem abaixo" : "perto"} da média dos produtos (${fmt(Math.round(med))}). ${r.raz > med*3 ? "Ou seja, há pouca pesquisa orgânica para o tamanho da produção." : r.raz < med/3 ? "Ou seja, a pesquisa orgânica é grande perto da produção cadastrada." : ""}`;
+    } else {
+      const lac = rows.filter(r=>r.prod>=100).sort((a,b)=>b.raz-a.raz).slice(0,6);
+      const mais = rows.slice().sort((a,b)=>b.cie-a.cie).slice(0,4);
+      html = `${d.lugar ? d.lugar[0].toUpperCase()+d.lugar.slice(1)+", os" : "Os"} produtos com mais produção orgânica e menos pesquisa orgânica da Embrapa são: <ul>${lac.map(r=>`<li><b>${esc(r.nome)}</b>: ${fmt(r.prod)} produtores, ${plural(r.cie,"conteúdo","conteúdos")}</li>`).join("")}</ul>Os mais pesquisados são ${lista(mais.map(r=>`${r.nome.toLowerCase()} (${fmt(r.cie)})`))}. A aba Produção x Ciência mostra todos os produtos.`;
+    }
+  } else if (intencao === "unidades"){
+    const uc = Object.entries(countBy(items, i=>[i.u])).sort((a,b)=>b[1]-a[1]);
+    html = uc.length ? `As Unidades da Embrapa com mais conteúdos ${recorte} são ${lista(uc.slice(0,6).map(([u,n])=>`Embrapa ${u} (${fmt(n)})`))}.` : `Não encontrei conteúdos ${recorte}.`;
+  } else {
+    if (nada) return {html: `Não reconheci um produto, lugar ou tema na pergunta. Tente algo como "café orgânico em Minas Gerais", "compostagem no Cerrado" ou "quem pesquisa agroecologia no Pará". Escreva "ajuda" para ver como eu funciono.`};
+    if (!items.length){
+      html = `Não encontrei conteúdos da Embrapa sobre orgânicos e agroecologia ${recorte}.`;
+      const sem = comFiltros({...f, uf:"", regiao:"", bioma:"", a0:"", a1:"", q: usarQ}, () => itemsF().length);
+      if (sem && (f.uf || f.regiao || f.bioma || f.a0 || f.a1)) html += ` Sem o filtro de lugar e de período, existem ${plural(sem, "conteúdo", "conteúdos")}${d.tema ? " sobre "+d.tema : ""}. Muitos textos não citam o lugar onde o trabalho foi feito.`;
+      else html += ` Tente uma pergunta com menos detalhes.`;
+    }
+    else {
+      const tp = t => items.filter(i=>i.t===t).length;
+      const top = items.slice().sort((a,b)=>(b.n==="N")-(a.n==="N")||(b.a||0)-(a.a||0)).slice(0,5);
+      const uc = Object.entries(countBy(items, i=>i.u ? [i.u] : [])).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([u])=>"Embrapa "+u);
+      html = `Encontrei <b>${plural(items.length, "conteúdo", "conteúdos")}</b> ${recorte}${FORMATO_NOME[f.tipo] ? ` entre ${FORMATO_NOME[f.tipo]}` : ""}: ${plural(tp("P"),"publicação","publicações")}, ${plural(tp("J"),"projeto","projetos")} e ${plural(tp("S"),"solução tecnológica","soluções tecnológicas")}. Quem mais trabalha nisso: ${lista(uc)}. Os mais recentes com ligação direta ao tema:<ul>${top.map(link).join("")}</ul>`;
+      if (f.produto !== ""){ const n = comFiltros({...f, q:""}, () => totProd()); html += `Nesse mesmo recorte existem ${plural(n, "produtor orgânico", "produtores orgânicos")} de ${d.tema} cadastrados.`; }
+    }
+  }
+  setCamada(camada); setF({...f, q: usarQ});
+  return {html: html + `<div class="meta" style="margin-top:8px"><button class="btn ver" data-p="mapa">Ver no mapa</button><button class="btn ver" data-p="${intencao==="pessoas"?"pessoas":intencao==="produtores"?"produtores":intencao==="lacunas"?"cruza":"conteudos"}">Ver a lista</button></div>`};
+}
+function addMsg(cls, html){ const d = document.createElement("div"); d.className = "msg "+cls; if (cls==="u") d.textContent = html; else d.innerHTML = html; $("#msgs").append(d); d.querySelectorAll(".ver").forEach(b=>b.onclick=()=>showTab(b.dataset.p)); return d; }
+function perguntar(q){
+  if (!q) return;
+  addMsg("u", q);
+  try { addMsg("c", responder(q).html); } catch(e){ console.error(e); addMsg("c", "Não consegui responder essa. Tente uma pergunta mais curta, com um produto, um lugar ou um tema."); }
+  $("#msgs").lastElementChild.scrollIntoView({block:"nearest"});
+}
+
+const PERFIS = {
+  produtor: {quem:"Para quem produz", cor:"--ochre", tab:"conteudos", f:{tipo:"M"},
+    txt:"Mostramos primeiro os materiais para levar ao campo: soluções tecnológicas, folhetos, folders, cartilhas e livros da Embrapa sobre produção orgânica e agroecológica. Escolha seu produto no filtro ou pergunte direto.",
+    sugs:["Soluções para controle biológico","Compostagem e biofertilizantes","Café orgânico","Banana orgânica"]},
+  extensionista: {quem:"Para quem faz extensão rural", cor:"--green", tab:"mapa", camada:"produtores", f:{},
+    txt:"O mapa abre nos produtores orgânicos. Filtre por estado ou produto e veja, na aba Conteúdos, os materiais da Embrapa para levar a campo.",
+    sugs:["Onde há mais produtores orgânicos no Nordeste?","Materiais sobre transição agroecológica","Materiais sobre morango orgânico","Sementes crioulas"]},
+  pesquisador: {quem:"Para quem pesquisa", cor:"--ink", tab:"cruza", ord:"lac", f:{},
+    txt:"Começamos pela comparação entre produção e ciência, ordenada pelas maiores lacunas. A aba Pesquisadores mostra quem já trabalha em cada recorte.",
+    sugs:["Quais produtos têm pouca pesquisa orgânica?","Quem pesquisa agroecologia na Caatinga?","Projetos sobre sistemas agroflorestais desde 2020","Unidades que trabalham com bioinsumos"]}
+};
+function aplicarPerfil(nome){
+  const p = PERFIS[nome]; $("#perfilb").hidden = !p; if (!p) return;
+  $("#perfilb").style.borderLeftColor = `var(${p.cor})`;
+  $("#pf-quem").textContent = p.quem; $("#pf-txt").textContent = p.txt;
+  $("#pf-sugs").innerHTML = p.sugs.map(q=>`<button>${esc(q)}</button>`).join("");
+  $("#pf-sugs").querySelectorAll("button").forEach(b=>b.onclick=()=>{ showTab("conversa"); perguntar(b.textContent); });
+  if (p.ord){ czOrd = p.ord; document.querySelectorAll("#cz-ord button").forEach(x=>x.setAttribute("aria-pressed", x.dataset.v===p.ord)); }
+  setCamada(p.camada || "conteudos");
+  setF(Object.fromEntries(ids.map(k=>[k, p.f[k] ?? ""])));
+  showTab(p.tab);
+}
+function setCamada(v){ view.camada = v; document.querySelectorAll("#m-camada button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.v===v)); }
+
+/* ---------- início ---------- */
+fetch("../index.html", {method:"HEAD"}).then(r => { if (!r.ok) $("#voltar").hidden = true; }).catch(() => { $("#voltar").hidden = true; });
+(async function(){
+  const [d, est, bio] = await Promise.all(["dados.json","estados.geojson","biomas.geojson"].map(u=>fetch(u).then(r=>r.json())));
+  D = d; D.tax.forEach(t=>TAX[t.id]=t.nome);
+  $("#f-tema").innerHTML = `<option value="">Todos</option>` + ["nucleo","pratica","contexto"].map(e=>`<optgroup label="${{nucleo:"Temas centrais",pratica:"Práticas",contexto:"Contexto social"}[e]}">${D.tax.filter(t=>t.eixo===e).map(t=>`<option value="${t.id}">${t.nome}</option>`).join("")}</optgroup>`).join("");
+  $("#f-cadeia").innerHTML = `<option value="">Todas</option>` + D.cad.map((c,k)=>`<option value="${k}">${c}</option>`).join("");
+  $("#f-produto").innerHTML = `<option value="">Todos</option>` + [...new Set(D.produtos.map(p=>p.grupo))].map(g=>`<optgroup label="${g}">${D.produtos.map((p,k)=>[p,k]).filter(([p])=>p.grupo===g).map(([p,k])=>`<option value="${k}">${p.nome}</option>`).join("")}</optgroup>`).join("");
+  document.querySelectorAll("#cz-ord button").forEach(b=>b.onclick=()=>{ czOrd=b.dataset.v; document.querySelectorAll("#cz-ord button").forEach(x=>x.setAttribute("aria-pressed", x===b)); cruza(); });
+  $("#f-bioma").innerHTML += BIOMAS.map(b=>`<option>${b}</option>`).join("");
+  $("#f-regiao").innerHTML += ["Norte","Nordeste","Centro-Oeste","Sudeste","Sul"].map(b=>`<option>${b}</option>`).join("");
+  $("#f-uf").innerHTML += Object.entries(D.ufs).sort((a,b)=>a[1][0].localeCompare(b[1][0])).map(([u,[n]])=>`<option value="${u}">${n}</option>`).join("");
+  $("#taxo").innerHTML = D.tax.map(t=>`<div class="${t.eixo==="pratica"?"p":t.eixo==="contexto"?"x":""}"><h3>${t.nome}</h3><p>${t.exp}</p><code>${{nucleo:"tema central",pratica:"prática",contexto:"contexto (só filtro)"}[t.eixo]}</code></div>`).join("");
+  $("#foot").textContent = `Dados preparados em ${D.gerado.split("-").reverse().join("/")}.`;
+  initMap(est, bio); readF(); render();
+  ids.forEach(k => $("#f-"+k).addEventListener(k==="q"?"input":"change", ()=>{ readF(); render(); }));
+  $("#f-limpar").onclick = ()=>setF(Object.fromEntries(ids.map(k=>[k,""])));
+  document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>showTab(t.dataset.p));
+  document.querySelectorAll("#m-camada button").forEach(b=>b.onclick=()=>{ setCamada(b.dataset.v); render(); });
+  document.querySelectorAll("#m-onde button").forEach(b=>b.onclick=()=>{ view.onde=b.dataset.v; document.querySelectorAll("#m-onde button").forEach(x=>x.setAttribute("aria-pressed", x===b)); render(); });
+  $("#m-biomas").onchange = e=>{ view.biomas = e.target.checked; render(); };
+  $("#lst-more").onclick = ()=>{ lim.lst += 30; render(); };
+  $("#pes-more").onclick = ()=>{ lim.pes += 40; render(); };
+  $("#prd-more").onclick = ()=>{ lim.prd += 40; render(); };
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", render);
+  new MutationObserver(render).observe(document.documentElement, {attributes:true, attributeFilter:["data-theme"]});
+  $("#ask").addEventListener("submit", e=>{ e.preventDefault(); const q = $("#ask-in").value.trim(); $("#ask-in").value = ""; perguntar(q); });
+  document.querySelectorAll("#sugs button").forEach(b=>b.onclick=()=>perguntar(b.textContent));
+  prepConversa();
+  // #produtor, #extensionista, #pesquisador abrem um perfil; #p=texto abre a conversa já com a pergunta (vem da busca da capa)
+  const lerHash = ()=>{ const h = location.hash.slice(1);
+    if (h.startsWith("p=")){ const q = decodeURIComponent(h.slice(2).replace(/\+/g," ")).trim(); if (q){ showTab("conversa"); perguntar(q); } return; }
+    aplicarPerfil(h); };
+  lerHash();
+  addEventListener("hashchange", lerHash);
+  $("#pf-sair").onclick = e=>{ e.preventDefault(); $("#perfilb").hidden = true; setF(Object.fromEntries(ids.map(k=>[k,""]))); setCamada("conteudos"); showTab("mapa"); };
+})();
+</script>
+
+</body>
+</html>
