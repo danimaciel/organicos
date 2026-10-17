@@ -354,10 +354,24 @@ async function carregarPontos(){
   try { CAD = await fetch("cadastro.json").then(r=>r.json()); } catch(e){}
   if (!CAD.csv){ PONTOS = []; return PONTOS; }
   try {
-    const [txt, mun] = await Promise.all([fetch(CAD.csv).then(r=>r.text()), fetch("municipios.json").then(r=>r.json())]);
+    const [txt, mun] = await Promise.all([fetch(CAD.csv, {cache:"no-store"}).then(r=>r.text()), fetch("municipios.json").then(r=>r.json())]);
     // colunas da aba "Publicar": nome, tipo, UF, município, endereço, link do Maps, dias, horário, produtos, garantia, entrega, contato, data
-    PONTOS = d3.csvParseRows(txt).slice(1).filter(r => r[0]).map(r => {
-      const [nome, tipo, uf, municipio, endereco, link, dias, horario, produtos, garantia, entrega, contato] = r.map(x => (x||"").trim());
+    // lê as colunas pelo nome do cabeçalho (funciona com a aba "Publicar" ou com a aba de respostas)
+    const linhas = d3.csvParseRows(txt), cab = (linhas[0]||[]).map(h => (h||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase());
+    const col = re => cab.findIndex(h => re.test(h));
+    const ix = {nome: col(/nome do local/), tipo: col(/^tipo/), uf: col(/estado|^uf/), municipio: col(/municipio/), endereco: col(/endereco/),
+                link: col(/google maps/), dias: col(/dias/), horario: col(/horario/), produtos: col(/^produtos/), garantia: col(/garantid/),
+                entrega: col(/entrega/), contato: col(/contato/), aprovado: col(/^aprovado/)};
+    const posFixa = ix.nome < 0;  // sem cabeçalho reconhecível: usa a ordem da aba "Publicar"
+    if (posFixa) ["nome","tipo","uf","municipio","endereco","link","dias","horario","produtos","garantia","entrega","contato"].forEach((k,i) => ix[k] = i);
+    PONTOS = linhas.slice(1).filter(r => {
+      if (ix.aprovado >= 0) return /^sim$/i.test((r[ix.aprovado]||"").trim());
+      return (r[ix.nome]||"").trim();
+    }).map(r => {
+      const v = k => ix[k] >= 0 ? (r[ix[k]]||"").trim() : "";
+      const [nome, tipo, uf, municipio, endereco, link, dias, horario, produtos, garantia, entrega, contato] =
+        ["nome","tipo","uf","municipio","endereco","link","dias","horario","produtos","garantia","entrega","contato"].map(v);
+      if (!nome) return null;
       const mm = mun[chaveMun(municipio, uf)]; const exato = coordDoLink(link);
       if (!mm && !exato) return null;
       return {nome, tipo, uf, municipio: mm ? mm[2] : municipio+"-"+uf, endereco, link, dias, horario, produtos, garantia, entrega, contato,
