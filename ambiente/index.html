@@ -343,7 +343,7 @@ function itemsF(skip){
 const nProd = (p, k = F.produto) => k === "" || k == null ? p.cn + p.sg : (p.pc[k] || 0);
 // onde comprar: feiras e pontos de venda do cadastro próprio (formulário Google; só entram os aprovados pela equipe)
 // ambiente/cadastro.json traz o link do formulário e o CSV publicado da aba "Publicar" da planilha
-let PONTOS = null, CAD = {formulario:"", csv:""};
+let PONTOS = null, CAD = {formulario:"", csv:""}, DIAG = null;
 const chaveMun = (m, uf) => (m||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toUpperCase().replace(/[^A-Z ]/g," ").replace(/\s+/g," ").trim() + "|" + (uf||"").trim().toUpperCase();
 function coordDoLink(u){
   const m = (u||"").match(/@(-?\d+\.\d+),(-?\d+\.\d+)/) || (u||"").match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/) || (u||"").match(/[?&](?:q|ll|query)=(-?\d+\.\d+),\s*(-?\d+\.\d+)/);
@@ -354,7 +354,7 @@ async function carregarPontos(){
   try { CAD = await fetch("cadastro.json").then(r=>r.json()); } catch(e){}
   if (!CAD.csv){ PONTOS = []; return PONTOS; }
   try {
-    const [txt, mun] = await Promise.all([fetch(CAD.csv, {cache:"no-store"}).then(r=>r.text()), fetch("municipios.json").then(r=>r.json())]);
+    const [txt, mun] = await Promise.all([fetch(CAD.csv, {cache:"no-store"}).then(async r=>{ const t = await r.text(); if (!r.ok || /^\s*</.test(t)) throw new Error("o link do CSV respondeu " + r.status + (r.ok ? ", mas com uma página em vez de planilha" : "")); return t; }), fetch("municipios.json").then(r=>r.json())]);
     // colunas da aba "Publicar": nome, tipo, UF, município, endereço, link do Maps, dias, horário, produtos, garantia, entrega, contato, data
     // lê as colunas pelo nome do cabeçalho (funciona com a aba "Publicar" ou com a aba de respostas)
     const linhas = d3.csvParseRows(txt), cab = (linhas[0]||[]).map(h => (h||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase());
@@ -364,6 +364,7 @@ async function carregarPontos(){
                 entrega: col(/entrega/), contato: col(/contato/), aprovado: col(/^aprovado/)};
     const posFixa = ix.nome < 0;  // sem cabeçalho reconhecível: usa a ordem da aba "Publicar"
     if (posFixa) ["nome","tipo","uf","municipio","endereco","link","dias","horario","produtos","garantia","entrega","contato"].forEach((k,i) => ix[k] = i);
+    DIAG = {linhas: Math.max(0, linhas.length-1), aprov: 0, semLugar: [], respostas: ix.aprovado >= 0, cab: ix.nome >= 0, erro: ""};
     PONTOS = linhas.slice(1).filter(r => {
       if (ix.aprovado >= 0) return /^sim$/i.test((r[ix.aprovado]||"").trim());
       return (r[ix.nome]||"").trim();
@@ -373,11 +374,12 @@ async function carregarPontos(){
         ["nome","tipo","uf","municipio","endereco","link","dias","horario","produtos","garantia","entrega","contato"].map(v);
       if (!nome) return null;
       const mm = mun[chaveMun(municipio, uf)]; const exato = coordDoLink(link);
-      if (!mm && !exato) return null;
+      DIAG.aprov++;
+      if (!mm && !exato){ DIAG.semLugar.push(nome + " (" + municipio + "/" + uf + ")"); return null; }
       return {nome, tipo, uf, municipio: mm ? mm[2] : municipio+"-"+uf, endereco, link, dias, horario, produtos, garantia, entrega, contato,
               ll: exato || [mm[0], mm[1]], exato: !!exato, b: mm ? mm[3] : "", rg: mm ? mm[4] : (D.ufs[uf]||[])[1]};
     }).filter(Boolean);
-  } catch(e){ console.error(e); PONTOS = []; }
+  } catch(e){ console.error(e); PONTOS = []; DIAG = {erro: String(e && e.message || e)}; }
   return PONTOS;
 }
 const pontosF = () => (PONTOS||[]).filter(p => (!F.uf || p.uf === F.uf) && (!F.regiao || p.rg === F.regiao) && (!F.bioma || p.b === F.bioma) && (!F.q || norm(p.nome+" "+p.municipio+" "+p.produtos+" "+p.tipo).includes(norm(F.q))));
@@ -463,12 +465,22 @@ function drawMap(items){
     const n = pontosF().length, cad = (CAD.campos && CAD.campos.nome) ? `<a href="../cadastro/">Cadastre uma feira ou ponto de venda</a>` : CAD.formulario ? `<a href="${esc(linkSeguro(CAD.formulario))}" target="_blank" rel="noopener">Cadastre uma feira ou ponto de venda</a>` : "";
     lg.innerHTML = PONTOS === null ? `<span>Carregando os pontos de venda…</span>`
       : !CAD.csv ? `<span>Os primeiros pontos de venda aparecem aqui assim que forem aprovados pela equipe.</span>${cad?`<span>${cad}</span>`:""}<span>Veja também o <a href="https://feirasorganicas.org.br/" target="_blank" rel="noopener">Mapa de Feiras Orgânicas do Idec</a>.</span>`
-      : `<span><i class="sw" style="background:${css("--green")};border-radius:50%"></i>${fmt(n)} ${n===1?"ponto de venda aprovado":"pontos de venda aprovados"} pela equipe. Clique num ponto para abrir no mapa.</span>${cad?`<span>${cad}</span>`:""}<span><small>Pontos sem link do Google Maps ficam no centro do município.</small></span>`;
+      : `<span><i class="sw" style="background:${css("--green")};border-radius:50%"></i>${fmt(n)} ${n===1?"ponto de venda aprovado":"pontos de venda aprovados"} pela equipe. Clique num ponto para abrir no mapa.</span>${cad?`<span>${cad}</span>`:""}<span><small>Pontos sem link do Google Maps ficam no centro do município.</small></span>` + diagPontos();
     $("#m-onde").hidden = true; return;
   }
   lg.innerHTML = view.biomas ? BIOMAS.map(b=>`<span><i class="sw" style="background:var(${BCOL[b]})"></i>${b}</span>`).join("")
     : `<span><i class="sw" style="background:${base}"></i>cor do estado: quanto mais forte, mais ${conteudo?"conteúdos":"produtores"}</span><span><i class="sw" style="background:${conteudo?css("--ink"):base};border-radius:50%"></i>círculo: ${conteudo ? (view.onde==="citado"?"município citado no texto":"cidade da Unidade da Embrapa") : ocsV ? "produtores em OCS no município (passe o mouse para ver os grupos)" : "produtores no município"}</span>` + (ocsV ? `<span>OCS são grupos autorizados a vender direto ao consumidor, em feiras, entregas ou na propriedade. O endereço das feiras não está no cadastro. Veja também o <a href="https://feirasorganicas.org.br/" target="_blank" rel="noopener">Mapa de Feiras Orgânicas do Idec</a>.</span>` : "");
   $("#m-onde").hidden = !conteudo;
+}
+
+function diagPontos(){
+  if (!DIAG) return "";
+  if (DIAG.erro) return `<span class="diag">Não foi possível ler a planilha publicada (${esc(DIAG.erro)}).</span>`;
+  const m = [`A planilha publicada tem ${fmt(DIAG.linhas)} ${DIAG.linhas===1?"cadastro":"cadastros"}, ${fmt(DIAG.aprov)} com "sim" na coluna aprovado.`];
+  if (DIAG.respostas) m.push("Atenção: a aba publicada é a de respostas, com nome e e-mail de quem cadastrou. Publique só a aba Publicar.");
+  else if (!DIAG.cab) m.push("O cabeçalho da planilha não foi reconhecido.");
+  if (DIAG.semLugar.length) m.push("Município não encontrado: " + DIAG.semLugar.map(esc).join("; ") + ".");
+  return `<span class="diag"><small>${m.join(" ")}</small></span>`;
 }
 
 /* ---------- gráficos ---------- */
