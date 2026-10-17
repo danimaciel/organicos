@@ -84,6 +84,9 @@ h1 .l2{display:block;font-style:italic;font-weight:500;color:var(--lima)}
 .perfil i{font-style:normal;font-family:var(--f-display);font-size:24px;color:var(--c,var(--green));margin-top:auto;padding-top:6px}
 .perfil.p1{--c:var(--ochre)} .perfil.p2{--c:var(--green)} .perfil.p3{--c:var(--ink)} .perfil.p4{--c:var(--muted)}
 .todos{margin-top:14px;font-size:15px;color:var(--muted)}
+.cad-feira{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;margin-top:18px;padding:16px 20px;border-radius:14px;background:var(--ochre-soft);text-decoration:none;color:var(--ink)}
+.cad-feira span{color:var(--green);font-weight:600}
+.cad-feira:hover span{text-decoration:underline}
 @media (prefers-reduced-motion:reduce){.perfil,.chips a{transition:none}}
 
 .duo{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:40px;align-items:center;padding-block:56px 8px}
@@ -160,6 +163,7 @@ h1 .l2{display:block;font-style:italic;font-weight:500;color:var(--lima)}
       <a class="perfil p4" href="ambiente/index.html"><span class="pk">Geral</span><b>Tudo junto: mapa, filtros, cruzamentos e perguntas</b><i aria-hidden="true">→</i></a>
     </div>
     <p class="todos">Funciona no navegador, sem cadastro.</p>
+    <a class="cad-feira" href="cadastro/"><b>Conhece uma feira ou loja de orgânicos?</b> <span>Cadastre no mapa "Onde comprar" →</span></a>
   </section>
 
   <section class="duo">

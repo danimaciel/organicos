@@ -1,5 +1,21 @@
 {
  "formulario": "https://docs.google.com/forms/d/e/1FAIpQLSebSnjyVdF40kTUJPXDsxYDp4UMLKRPi7xE-mEsuW9BOjIS2g/viewform",
  "csv": "https://docs.google.com/spreadsheets/d/e/2PACX-1vT4SczBvpncBLpbIAkQc1jwBG0I6DMLaSXLTJTunmjnu7tlNZX4qqhUq3mSz9UPEWXfhcdPOsdCca4b/pub?gid=2110548887&single=true&output=csv",
- "campos": {}
+ "campos": {
+  "nome": "497982389",
+  "tipo": "1388134502",
+  "uf": "436445025",
+  "municipio": "897612510",
+  "endereco": "1277631674",
+  "maps": "2137410169",
+  "dias": "1979140320",
+  "horario": "1747952247",
+  "produtos": "1043860167",
+  "garantia": "1122038237",
+  "entrega": "606088634",
+  "contato": "880202233",
+  "quem": "649128161",
+  "email": "1895903815",
+  "autorizo": "306517666"
+ }
 }
