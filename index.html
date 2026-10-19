@@ -47,10 +47,11 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--focus);outline-offs
 /* véu: claro e quente no alto (texto escuro), verde-escuro embaixo (chips e fontes) */
 .capa::before{content:"";position:absolute;inset:0;z-index:-1;
   background:
-    radial-gradient(ellipse 48% 50% at 50% 38%, rgb(var(--creme) / .8) 0%, rgb(var(--creme) / .6) 50%, rgb(var(--creme) / 0) 100%),
-    linear-gradient(to bottom, rgb(var(--creme) / .4) 0%, rgb(255 214 150 / .18) 40%, rgb(var(--capa-fundo) / 0) 58%, rgb(var(--capa-fundo) / .35) 72%, rgb(var(--capa-fundo) / .85) 86%, rgb(var(--capa-fundo)) 100%)}
+    radial-gradient(ellipse 40% 46% at 50% 46%, rgb(var(--creme) / .72) 0%, rgb(var(--creme) / .5) 60%, rgb(var(--creme) / 0) 100%),
+    linear-gradient(to bottom, rgb(var(--creme) / .15) 0%, rgb(var(--creme) / .08) 40%, rgb(var(--capa-fundo) / 0) 58%, rgb(var(--capa-fundo) / .35) 72%, rgb(var(--capa-fundo) / .85) 86%, rgb(var(--capa-fundo)) 100%)}
 .capa .top b{color:var(--verde-escuro)}
-.capa .top span{color:#2b4a33}
+.capa .top span{color:#123d22;font-weight:600;text-shadow:0 0 10px rgb(250 244 226 / .95),0 0 3px rgb(250 244 226 / .9)}
+.capa .top b,.capa .sub,.capa .lede{text-shadow:0 0 14px rgb(250 244 226 / .9),0 0 4px rgb(250 244 226 / .8)}
 .capa .wrap{width:100%}
 .centro{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding-block:4px 28px}
 .capa .pill{font-family:var(--f-body);font-weight:600;font-size:13px;letter-spacing:.24em;text-transform:uppercase;color:var(--verde-escuro);background:rgb(214 234 196 / .9);border:1px solid rgb(18 61 34 / .15);padding:9px 24px;border-radius:999px}
@@ -61,7 +62,7 @@ h1{font-family:var(--f-serif);font-size:clamp(46px,7.4vw,96px);font-weight:700;l
 h1 .l2{display:block;font-style:italic;font-weight:700;color:var(--verde-folha);font-variation-settings:"SOFT" 0,"WONK" 0}
 .sub{font-family:var(--f-serif);font-weight:700;font-size:clamp(22px,3vw,38px);line-height:1.15;color:var(--verde-escuro);margin-top:8px;text-wrap:balance}
 .traco{width:58px;height:4px;border-radius:4px;background:var(--sol);margin-top:20px}
-.lede{font-size:clamp(17px,1.6vw,20px);color:#1f3526;max-width:58ch;margin-top:18px}
+.lede{font-size:clamp(17px,1.6vw,20px);color:#132a1b;font-weight:600;max-width:58ch;margin-top:18px}
 .busca{display:flex;align-items:center;gap:10px;width:min(740px,100%);margin-top:30px;background:#fff;border-radius:999px;padding:7px 7px 7px 24px;box-shadow:0 18px 40px -16px rgb(0 0 0 / .55)}
 .busca svg{width:20px;height:20px;flex:none;color:#3e4f43}
 .busca input{flex:1;min-width:0;border:0;background:transparent;font:17px var(--f-body);color:#1d2a22;padding:11px 0}
@@ -83,7 +84,7 @@ h1 .l2{display:block;font-style:italic;font-weight:700;color:var(--verde-folha);
 @media (max-width:640px){
   .capa .pill{letter-spacing:.12em;font-size:11px;padding:8px 14px}
   .capa{background-position:30% 60%;min-height:auto}
-  .capa::before{background:linear-gradient(to bottom, rgb(var(--creme) / .82) 0%, rgb(var(--creme) / .72) 45%, rgb(var(--creme) / .35) 60%, rgb(var(--capa-fundo) / .55) 72%, rgb(var(--capa-fundo) / .92) 86%, rgb(var(--capa-fundo)) 100%)}
+  .capa::before{background:linear-gradient(to bottom, rgb(var(--creme) / .62) 0%, rgb(var(--creme) / .58) 45%, rgb(var(--creme) / .3) 60%, rgb(var(--capa-fundo) / .55) 72%, rgb(var(--capa-fundo) / .92) 86%, rgb(var(--capa-fundo)) 100%)}
   .busca{padding-left:16px}.busca button{padding:12px 16px}.busca button svg{display:none}
   .chips a{font-size:15px}
   .fontes-linha{letter-spacing:.14em;gap:6px 10px;font-size:13px;padding-block:24px 8px}

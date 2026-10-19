@@ -39,12 +39,12 @@ a{color:var(--green)}
 
 .faixa{position:relative;color:#123d22;background:#0c2a14 url("../img/foto_capa.jpg") center 60%/cover no-repeat;isolation:isolate;text-align:center}
 .faixa::before{content:"";position:absolute;inset:0;z-index:-1;background:
-  radial-gradient(ellipse 55% 60% at 50% 45%, rgb(250 244 226 / .82) 0%, rgb(250 244 226 / .6) 50%, rgb(250 244 226 / 0) 100%),
-  linear-gradient(to bottom, rgb(250 244 226 / .45) 0%, rgb(255 214 150 / .18) 55%, rgb(12 42 20 / .2) 78%, rgb(12 42 20 / .6) 100%)}
+  radial-gradient(ellipse 55% 60% at 50% 45%, rgb(250 244 226 / .72) 0%, rgb(250 244 226 / .45) 50%, rgb(250 244 226 / 0) 100%),
+  linear-gradient(to bottom, rgb(250 244 226 / .15) 0%, rgb(250 244 226 / .05) 55%, rgb(12 42 20 / .2) 78%, rgb(12 42 20 / .6) 100%)}
 .faixa .top{display:flex;justify-content:space-between;gap:12px;padding-block:18px;font-size:15px;text-align:left}
 .faixa .top a{color:#123d22;text-decoration:none;font-weight:600}
 .faixa .top a:hover{text-decoration:underline}
-.faixa .top span{color:#2b4a33}
+.faixa .top span{color:#123d22;font-weight:600}
 .faixa .tit{display:flex;flex-direction:column;align-items:center;padding-block:6px 40px}
 .pill{display:inline-block;font-weight:600;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:#123d22;background:rgb(214 234 196 / .9);border:1px solid rgb(18 61 34 / .15);padding:8px 20px;border-radius:999px}
 .selo{display:flex;align-items:center;gap:12px;margin-top:16px}
@@ -53,7 +53,8 @@ a{color:var(--green)}
 h1{font-family:var(--f-serif);font-size:clamp(36px,5.6vw,64px);font-weight:700;line-height:1;letter-spacing:-.01em;color:#123d22;margin-top:6px;text-wrap:balance}
 h1 em{display:block;font-weight:700;color:#5e9a2f}
 .traco{width:52px;height:4px;border-radius:4px;background:#e8b21c;margin-top:18px}
-.faixa p.lede{margin-top:14px;max-width:56ch;color:#1f3526}
+.faixa p.lede{margin-top:14px;max-width:56ch;color:#132a1b;font-weight:600;text-shadow:0 0 14px rgb(250 244 226 / .9),0 0 4px rgb(250 244 226 / .8)}
+.faixa .top a,.faixa .top span{text-shadow:0 0 10px rgb(250 244 226 / .95),0 0 3px rgb(250 244 226 / .9)}
 .faixa .base{position:relative;height:56px;background:#123d22}
 .faixa .base svg{position:absolute;inset:0;width:100%;height:100%}
 .credito{position:absolute;right:max(16px,env(safe-area-inset-right,0px));bottom:0;line-height:56px;font-size:12px;color:rgb(255 255 255 / .8);margin:0}
@@ -90,7 +91,7 @@ button[disabled]{opacity:.6;cursor:wait}
 .ok p{margin-top:8px;color:var(--muted)}
 .ok .acoes{display:flex;flex-wrap:wrap;gap:16px;margin-top:16px;font-weight:600}
 @media (max-width:560px){.duas{grid-template-columns:minmax(0,1fr)}fieldset{padding:18px 16px 4px}}
-@media (max-width:560px){.faixa h1{font-size:34px}.pill{letter-spacing:.14em;font-size:11px}.faixa::before{background:linear-gradient(to bottom, rgb(250 244 226 / .82) 0%, rgb(250 244 226 / .74) 70%, rgb(250 244 226 / .5) 100%)}.credito{position:static;line-height:1;padding-top:30px;text-align:center}}
+@media (max-width:560px){.faixa h1{font-size:34px}.pill{letter-spacing:.14em;font-size:11px}.faixa::before{background:linear-gradient(to bottom, rgb(250 244 226 / .62) 0%, rgb(250 244 226 / .58) 70%, rgb(250 244 226 / .4) 100%)}.credito{position:static;line-height:1;padding-top:30px;text-align:center}}
 @media (prefers-reduced-motion:reduce){.chips span{transition:none}}
 </style>
 </head>
