@@ -113,7 +113,10 @@ input[type=number]{width:5.5em}
 table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
 th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
 th{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;white-space:nowrap}
-td.num{text-align:right;font-family:var(--f-mono);font-size:13px}
+td.num{text-align:center;font-family:var(--f-mono);font-size:13px}
+/* tabelas: colunas centralizadas; a primeira (nome) e textos longos à esquerda */
+.tbl th,.tbl td{text-align:center}
+.tbl th:first-child,.tbl td:first-child,#prd td:last-child,.tbl:has(#prd) th:last-child{text-align:left}
 .more{margin-top:var(--s3)}
 .chat{display:flex;flex-direction:column;gap:var(--s3)}
 .msg{max-width:72ch;padding:var(--s3) var(--s4);border-radius:10px}
@@ -128,8 +131,9 @@ td.num{text-align:right;font-family:var(--f-mono);font-size:13px}
 .ask input{flex:1 1 260px;font:15px var(--f-body);padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);min-width:0}
 .sugs{display:flex;flex-wrap:wrap;gap:var(--s2)}
 .sugs button{font:14px var(--f-body);background:var(--surface);color:var(--ink);border:1px dashed var(--line);border-radius:99px;padding:4px 12px;cursor:pointer}
-.prose{max-width:72ch;display:flex;flex-direction:column;gap:var(--s3)}
+.prose{max-width:none;display:flex;flex-direction:column;gap:var(--s3)}
 .prose ul{margin:0;padding-left:1.2em}
+.prose p,.prose li{text-align:justify;hyphens:auto;-webkit-hyphens:auto}
 .taxo{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:var(--s3)}
 .taxo div{border-top:3px solid var(--green);padding-top:var(--s2)}
 .taxo div.p{border-color:var(--ochre)}
