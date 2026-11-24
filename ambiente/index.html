@@ -340,12 +340,12 @@ td.num{text-align:right;font-family:var(--f-mono);font-size:13px}
   </section>
 
   <section class="panel" id="p-cruza" role="tabpanel" aria-labelledby="t-cruza">
-    <div class="aba-intro"><h2>O que se produz e o que se pesquisa</h2><p class="lede">A tabela mostra, para cada produto, quantos produtores orgânicos o declaram e quantos conteúdos da Embrapa sobre orgânicos e agroecologia falam dele. Os produtores vêm do CNPO (janeiro de 2026) e do SIGORG, e os conteúdos das bases da Embrapa (setembro de 2026). Os filtros de lugar valem para os dois lados. Tema, tipo e ano valem só para os conteúdos.</p><p class="nota"><b>Como ler a situação.</b> Para cada produto, dividimos os produtores pelos conteúdos. Depois comparamos com o produto típico do recorte, que hoje tem <b id="cz-med">63</b> produtores por conteúdo (a mediana). Quando passa do triplo disso, é <b>pouca pesquisa orgânica</b>. Quando fica abaixo de um terço, é <b>muita pesquisa</b>. Entre os dois, é <b>equilibrado</b>. A coluna "Toda a Embrapa" mostra quanto a Embrapa pesquisa o produto em qualquer sistema de produção.</p></div>
+    <div class="aba-intro"><h2>O que se produz e o que se pesquisa</h2><p class="lede">A tabela mostra, para cada produto, quantos produtores orgânicos o declaram e quantos conteúdos da Embrapa sobre orgânicos e agroecologia falam dele. Os produtores vêm do CNPO (janeiro de 2026) e do SIGORG, e os conteúdos das bases da Embrapa (setembro de 2026). Os filtros de lugar valem para os dois lados. Tema, tipo e ano valem só para os conteúdos.</p><p class="nota"><b>Como ler a situação.</b> Para cada produto, dividimos os produtores pelos conteúdos. Depois comparamos com o produto típico do recorte, que hoje tem <b id="cz-med">63</b> produtores por conteúdo (a mediana). Quando passa do triplo disso, é uma <b>possível lacuna</b>. Quando fica abaixo de um terço, o produto está <b>bem estudado</b>. Entre os dois, está <b>na média</b>. A conta só compara quantos produtores há para cada estudo. Ela não mede se o produto precisa de mais pesquisa, porque alguns produtos pedem menos estudo que outros. Quem conhece o produto confirma se a lacuna é real. A coluna "Toda a Embrapa" mostra quanto a Embrapa pesquisa o produto em qualquer sistema de produção.</p></div>
     <div class="box">
       <div class="seg" id="cz-ord">
-        <button aria-pressed="true" data-v="prod">Ordenar por produtores</button><button aria-pressed="false" data-v="lac">Maiores lacunas</button><button aria-pressed="false" data-v="cie">Mais pesquisados</button>
+        <button aria-pressed="true" data-v="prod">Ordenar por produtores</button><button aria-pressed="false" data-v="lac">Possíveis lacunas</button><button aria-pressed="false" data-v="cie">Mais pesquisados</button>
       </div>
-      <div class="sub">Cada ponto é um produto (escala logarítmica). Abaixo da linha: muita produção para pouca pesquisa orgânica.</div>
+      <div class="sub">Cada ponto é um produto (escala logarítmica). Abaixo da linha: muitos produtores para poucos estudos orgânicos.</div>
       <svg id="scatter" viewBox="0 0 720 380" role="img" aria-label="Produtores orgânicos por conteúdos da Embrapa, por produto" style="width:100%;display:block"></svg>
       <div class="tbl" style="margin-top:12px"><table><thead><tr><th>Produto</th><th>Grupo</th><th>Produtores orgânicos</th><th>Conteúdos orgânicos da Embrapa</th><th>Toda a Embrapa</th><th>Produtores por conteúdo</th><th>Situação</th></tr></thead><tbody id="cz"></tbody></table></div>
     </div>
@@ -384,7 +384,7 @@ td.num{text-align:right;font-family:var(--f-mono);font-size:13px}
         <button>O que a Embrapa tem sobre café orgânico?</button>
         <button>Quem pesquisa agroecologia na Caatinga?</button>
         <button>Onde há mais produtores orgânicos no Nordeste?</button>
-        <button>Quais produtos têm pouca pesquisa orgânica no Sul?</button>
+        <button>Onde há possíveis lacunas de pesquisa no Sul?</button>
         <button>Soluções tecnológicas de compostagem</button>
       </div>
       <div class="chat" id="msgs"></div>
@@ -667,7 +667,7 @@ function cruza(){
   rows.forEach(r=>r.raz = r.prod/Math.max(1,r.cie));
   const med = d3.median(rows.filter(r=>r.prod>0), r=>r.raz) || 1;
   const cm = $("#cz-med"); if (cm) cm.textContent = fmt(Math.round(med));
-  rows.forEach(r=>r.sit = r.prod===0 ? ["mu","Sem produtores no recorte"] : r.raz > med*3 ? ["lac","Pouca pesquisa orgânica"] : r.raz < med/3 ? ["ok","Muita pesquisa"] : ["mu","Equilibrado"]);
+  rows.forEach(r=>r.sit = r.prod===0 ? ["mu","Sem produtores no recorte"] : r.raz > med*3 ? ["lac","Possível lacuna"] : r.raz < med/3 ? ["ok","Bem estudado"] : ["mu","Na média"]);
   const ord = {prod:(a,b)=>b.prod-a.prod, lac:(a,b)=>b.raz-a.raz || b.prod-a.prod, cie:(a,b)=>b.cie-a.cie}[czOrd];
   rows.sort(ord);
   const mp = d3.max(rows,r=>r.prod)||1, mc = d3.max(rows,r=>r.cie)||1;
@@ -818,11 +818,11 @@ function responder(pergunta){
     if (f.produto !== ""){
       const r = rows.find(x=>x.k===f.produto) || {prod:0, cie:0, raz:0};
       const med = d3.median(rows, x=>x.raz) || 1;
-      html = `${[d.tema[0].toUpperCase()+d.tema.slice(1), d.lugar].filter(Boolean).join(" ")}: ${plural(r.prod, "produtor orgânico", "produtores orgânicos")} e ${plural(r.cie, "conteúdo orgânico", "conteúdos orgânicos")} da Embrapa. São ${fmt(Math.round(r.raz))} produtores para cada conteúdo, ${r.raz > med*3 ? "bem acima" : r.raz < med/3 ? "bem abaixo" : "perto"} da média dos produtos (${fmt(Math.round(med))}). ${r.raz > med*3 ? "Ou seja, há pouca pesquisa orgânica para o tamanho da produção." : r.raz < med/3 ? "Ou seja, a pesquisa orgânica é grande perto da produção cadastrada." : ""}`;
+      html = `${[d.tema[0].toUpperCase()+d.tema.slice(1), d.lugar].filter(Boolean).join(" ")}: ${plural(r.prod, "produtor orgânico", "produtores orgânicos")} e ${plural(r.cie, "conteúdo orgânico", "conteúdos orgânicos")} da Embrapa. São ${fmt(Math.round(r.raz))} produtores para cada conteúdo, ${r.raz > med*3 ? "bem acima" : r.raz < med/3 ? "bem abaixo" : "perto"} da média dos produtos (${fmt(Math.round(med))}). ${r.raz > med*3 ? "É uma possível lacuna: poucos estudos orgânicos para o tamanho da produção. Quem conhece o produto confirma se ela é real." : r.raz < med/3 ? "É um produto bem estudado perto da produção cadastrada." : ""}`;
     } else {
       const lac = rows.filter(r=>r.prod>=100).sort((a,b)=>b.raz-a.raz).slice(0,6);
       const mais = rows.slice().sort((a,b)=>b.cie-a.cie).slice(0,4);
-      html = `${d.lugar ? d.lugar[0].toUpperCase()+d.lugar.slice(1)+", os" : "Os"} produtos com mais produção orgânica e menos pesquisa orgânica da Embrapa são: <ul>${lac.map(r=>`<li><b>${esc(r.nome)}</b>: ${fmt(r.prod)} produtores, ${plural(r.cie,"conteúdo","conteúdos")}</li>`).join("")}</ul>Os mais pesquisados são ${lista(mais.map(r=>`${r.nome.toLowerCase()} (${fmt(r.cie)})`))}. A aba Produção x Ciência mostra todos os produtos.`;
+      html = `${d.lugar ? d.lugar[0].toUpperCase()+d.lugar.slice(1)+", os" : "Os"} produtos com mais produtores por estudo orgânico da Embrapa (possíveis lacunas) são: <ul>${lac.map(r=>`<li><b>${esc(r.nome)}</b>: ${fmt(r.prod)} produtores, ${plural(r.cie,"conteúdo","conteúdos")}</li>`).join("")}</ul>Os mais pesquisados são ${lista(mais.map(r=>`${r.nome.toLowerCase()} (${fmt(r.cie)})`))}. A aba Produção x Ciência mostra todos os produtos. A conta só compara produtores com estudos; quem conhece cada produto confirma se a lacuna é real.`;
     }
   } else if (intencao === "unidades"){
     const uc = Object.entries(countBy(items, i=>[i.u])).sort((a,b)=>b[1]-a[1]);
@@ -862,8 +862,8 @@ const PERFIS = {
     txt:"O mapa abre nos produtores orgânicos. Filtre por estado ou produto e veja, na aba Conteúdos, os materiais da Embrapa para levar a campo.",
     sugs:["Onde há mais produtores orgânicos no Nordeste?","Materiais sobre transição agroecológica","Materiais sobre morango orgânico","Sementes crioulas"]},
   pesquisador: {quem:"Para quem pesquisa", cor:"--ink", tab:"cruza", ord:"lac", f:{},
-    txt:"Começamos pela comparação entre produção e ciência, ordenada pelas maiores lacunas. A aba Pesquisadores mostra quem já trabalha em cada recorte.",
-    sugs:["Quais produtos têm pouca pesquisa orgânica?","Quem pesquisa agroecologia na Caatinga?","Projetos sobre sistemas agroflorestais desde 2020","Unidades que trabalham com bioinsumos"]}
+    txt:"Começamos pela comparação entre produção e ciência, ordenada pelas possíveis lacunas. A aba Pesquisadores mostra quem já trabalha em cada recorte.",
+    sugs:["Quais produtos têm possíveis lacunas de pesquisa?","Quem pesquisa agroecologia na Caatinga?","Projetos sobre sistemas agroflorestais desde 2020","Unidades que trabalham com bioinsumos"]}
 };
 function aplicarPerfil(nome){
   const p = PERFIS[nome]; $("#perfilb").hidden = !p; if (!p) return;
