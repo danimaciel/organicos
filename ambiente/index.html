@@ -157,6 +157,17 @@ td.num{text-align:right;font-family:var(--f-mono);font-size:13px}
 .rd-nota{font-size:12px;color:var(--muted);margin-top:6px}
 .rd-det{font-size:13px;color:var(--muted);margin-top:6px}
 .rd-det b{color:var(--ink);font-weight:600}
+.rd-voz{margin-top:8px}
+.btn-voz{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer;font:600 14px var(--f-body)}
+.btn-voz:hover{border-color:var(--green)}
+.btn-voz .mic{width:10px;height:14px;border-radius:5px;border:2px solid currentColor;position:relative}
+.btn-voz .mic::after{content:"";position:absolute;left:50%;bottom:-6px;width:2px;height:4px;background:currentColor;transform:translateX(-50%)}
+.btn-voz .som{width:0;height:0;border-top:6px solid transparent;border-bottom:6px solid transparent;border-right:9px solid currentColor;position:relative;margin-right:4px}
+.btn-voz .som::after{content:"";position:absolute;left:2px;top:-7px;width:8px;height:14px;border:2px solid currentColor;border-left:0;border-radius:0 8px 8px 0}
+.btn-voz[aria-pressed="true"]{background:var(--ochre);border-color:var(--ochre);color:#fff}
+@keyframes pulsar{50%{opacity:.35}}
+.btn-voz[aria-pressed="true"] .mic{animation:pulsar 1s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.btn-voz[aria-pressed="true"] .mic{animation:none}}
 #rd-svg{width:100%;display:block;aspect-ratio:1/1;max-height:600px}
 #rd-svg text{font-family:var(--f-body);fill:var(--ink)}
 #rd-svg .lbl{font-size:var(--fs,13.5px);paint-order:stroke;stroke:var(--surface);stroke-width:4px;stroke-linejoin:round}
@@ -183,6 +194,9 @@ td.num{text-align:right;font-family:var(--f-mono);font-size:13px}
 .card li.voce{font-weight:700}
 .card .lk{font-size:13px;color:var(--green);font-weight:600;background:none;border:0;padding:0;cursor:pointer;text-align:left;text-decoration:underline;font-family:var(--f-body)}
 .card a.lk{text-decoration:underline}
+.passos{counter-reset:p;list-style:none;padding:0!important}
+.passos li{counter-increment:p;position:relative;padding-left:30px;min-height:24px}
+.passos li::before{content:counter(p);position:absolute;left:0;top:0;width:22px;height:22px;border-radius:50%;background:var(--ochre-soft);color:var(--ink);font:700 12px/22px var(--f-body);text-align:center}
 .rd-sep{margin-top:var(--s5)}
 .rd-sep summary{cursor:pointer;padding:var(--s2) 0}
 #rd-lista{max-height:760px;overflow-y:auto;padding-right:6px}
@@ -204,7 +218,8 @@ td.num{text-align:right;font-family:var(--f-mono);font-size:13px}
   </div>
 
   <nav class="tabs" role="tablist">
-    <button class="tab" role="tab" aria-selected="true" data-p="mapa" id="t-mapa">Mapa</button>
+    <button class="tab" role="tab" aria-selected="true" data-p="rede" id="t-rede">Para você</button>
+    <button class="tab" role="tab" aria-selected="false" data-p="mapa" id="t-mapa">Mapa</button>
     <button class="tab" role="tab" aria-selected="false" data-p="conteudos" id="t-conteudos">Conteúdos</button>
     <button class="tab" role="tab" aria-selected="false" data-p="cruza" id="t-cruza">Produção x Ciência</button>
     <button class="tab" role="tab" aria-selected="false" data-p="pessoas" id="t-pessoas">Pesquisadores</button>
@@ -228,7 +243,57 @@ td.num{text-align:right;font-family:var(--f-mono);font-size:13px}
     <button class="btn" id="f-limpar">Limpar</button>
   </div>
 
-  <section class="panel on" id="p-mapa" role="tabpanel" aria-labelledby="t-mapa">
+  <section class="panel on" id="p-rede" role="tabpanel" aria-labelledby="t-rede">
+    <div class="rd-head">
+      <div><h2>Para você</h2>
+        <p class="lede" style="font-size:15px">Conte quem você é, onde está e o que produz. A página liga seus produtos aos temas que a Embrapa pesquisa, monta um kit de leitura e mostra quem produz, quem garante o selo e quem pesquisa perto de você.</p></div>
+      <div class="rd-ex" id="rd-ex"><span>Exemplos</span></div>
+    </div>
+    <div class="rede">
+      <div class="box rd-perfil">
+        <h3>Seu perfil</h3>
+        <label class="rd-lab" for="rd-texto">Quem é você e o que procura?</label>
+        <textarea id="rd-texto" placeholder="Ex.: Sou agricultora familiar em Pernambuco, produzo banana e mandioca e quero começar a vender em feira."></textarea>
+        <div class="rd-voz"><button type="button" class="btn-voz" id="rd-falar" hidden aria-pressed="false"><span class="mic" aria-hidden="true"></span><span id="rd-falarRot">Falar em vez de escrever</span></button></div>
+        <p class="rd-nota" id="rd-vozNota" hidden>O navegador transforma a fala em texto pelo serviço de voz dele (Google ou Apple). A página não grava nada.</p>
+        <div class="rd-det" id="rd-det" aria-live="polite"></div>
+        <span class="rd-lab">Você é</span><div class="pills" id="rd-ator"></div>
+        <label class="rd-lab" for="rd-uf">Estado</label><select id="rd-uf"><option value="">Todo o Brasil</option></select>
+        <label class="rd-lab" for="rd-mun">Município (opcional)</label><input type="text" id="rd-mun" list="rd-muns" placeholder="Comece a digitar" autocomplete="off"><datalist id="rd-muns"></datalist>
+        <span class="rd-lab">Seus produtos</span><div class="rd-prods" id="rd-prods"></div>
+        <input type="text" id="rd-add" list="rd-plist" placeholder="Adicione: café, alface, leite…" autocomplete="off"><datalist id="rd-plist"></datalist>
+        <span class="rd-lab">Como garante (ou quer garantir) o orgânico</span><div class="pills" id="rd-gar"></div>
+        <div class="rd-acoes"><button class="btn primary" id="rd-montar">Ver resultados</button><button class="btn" id="rd-limpar">Limpar</button></div>
+        <p class="rd-nota">O perfil fica só neste navegador. Nada é enviado.</p>
+      </div>
+      <div class="box">
+        <h3>Sua constelação</h3>
+        <p class="rd-sub" id="rd-resumo"></p>
+        <div class="rd-focos" id="rd-focos"></div>
+        <svg id="rd-svg" viewBox="0 0 600 600" role="img" aria-label="Constelação: produto no centro, temas da Embrapa em volta e produtos vizinhos na borda"></svg>
+        <div class="rd-leg">
+          <span><i style="background:var(--green)"></i>temas centrais da Embrapa para o produto (tamanho = número de conteúdos)</span>
+          <span><i style="background:var(--ochre)"></i>práticas de base ecológica; contorno escuro = tem conteúdo no seu estado ou bioma</span>
+          <span><i style="border:2px solid var(--muted);background:none"></i>na borda: produtos que mais aparecem junto nos mesmos municípios. Clique para ir até eles</span>
+        </div>
+      </div>
+      <div class="box rd-kit">
+        <h3>Seu kit inicial</h3>
+        <div class="rd-tema" id="rd-tema"></div>
+        <button type="button" class="btn-voz" id="rd-ouvir" hidden aria-pressed="false" style="margin-top:var(--s2)"><span class="som" aria-hidden="true"></span><span id="rd-ouvirRot">Ouvir os primeiros resultados</span></button>
+        <div class="seg" id="rd-abas"></div>
+        <div class="list" id="rd-lista"></div>
+      </div>
+    </div>
+    <div class="box" style="margin-top:var(--s4)">
+      <h2 id="rd-perto-t">Quem está perto</h2>
+      <p class="lede" style="font-size:14px" id="rd-perto-s"></p>
+      <div class="rd-perto" id="rd-perto"></div>
+      <p class="rd-nota" style="margin-top:var(--s3)">Produtores aparecem só somados por município (CNPO, jan. 2026, e SIGORG). Pesquisadores: nomes como assinam publicações e projetos públicos da Embrapa. Entidades: certificadoras, OPAC e OCS cadastradas no MAPA.</p>
+    </div>
+  </section>
+
+  <section class="panel" id="p-mapa" role="tabpanel" aria-labelledby="t-mapa">
     <div class="grid">
       <div class="box">
         <div class="maptools">
@@ -292,52 +357,7 @@ td.num{text-align:right;font-family:var(--f-mono);font-size:13px}
   </section>
 
   <section class="panel" id="p-produtores" role="tabpanel" aria-labelledby="t-produtores">
-    <div class="rd-head">
-      <div><h2>Sua rede de produção orgânica</h2>
-        <p class="lede" style="font-size:15px">Conte quem você é, onde está e o que produz. A página liga seus produtos aos temas que a Embrapa pesquisa, monta um kit de leitura e mostra quem produz, quem garante o selo e quem pesquisa perto de você.</p></div>
-      <div class="rd-ex" id="rd-ex"><span>Exemplos</span></div>
-    </div>
-    <div class="rede">
-      <div class="box rd-perfil">
-        <h3>Seu perfil</h3>
-        <label class="rd-lab" for="rd-texto">Quem é você e o que procura?</label>
-        <textarea id="rd-texto" placeholder="Ex.: Sou agricultora familiar em Pernambuco, produzo banana e mandioca e quero começar a vender em feira."></textarea>
-        <div class="rd-det" id="rd-det"></div>
-        <span class="rd-lab">Você é</span><div class="pills" id="rd-ator"></div>
-        <label class="rd-lab" for="rd-uf">Estado</label><select id="rd-uf"><option value="">Todo o Brasil</option></select>
-        <label class="rd-lab" for="rd-mun">Município (opcional)</label><input type="text" id="rd-mun" list="rd-muns" placeholder="Comece a digitar" autocomplete="off"><datalist id="rd-muns"></datalist>
-        <span class="rd-lab">Seus produtos</span><div class="rd-prods" id="rd-prods"></div>
-        <input type="text" id="rd-add" list="rd-plist" placeholder="Adicione: café, alface, leite…" autocomplete="off"><datalist id="rd-plist"></datalist>
-        <span class="rd-lab">Como garante (ou quer garantir) o orgânico</span><div class="pills" id="rd-gar"></div>
-        <div class="rd-acoes"><button class="btn primary" id="rd-montar">Montar minha rede</button><button class="btn" id="rd-limpar">Limpar</button></div>
-        <p class="rd-nota">O perfil fica só neste navegador. Nada é enviado.</p>
-      </div>
-      <div class="box">
-        <h3>Sua constelação</h3>
-        <p class="rd-sub" id="rd-resumo"></p>
-        <div class="rd-focos" id="rd-focos"></div>
-        <svg id="rd-svg" viewBox="0 0 600 600" role="img" aria-label="Constelação: produto no centro, temas da Embrapa em volta e produtos vizinhos na borda"></svg>
-        <div class="rd-leg">
-          <span><i style="background:var(--green)"></i>temas centrais da Embrapa para o produto (tamanho = número de conteúdos)</span>
-          <span><i style="background:var(--ochre)"></i>práticas de base ecológica; contorno escuro = tem conteúdo no seu estado ou bioma</span>
-          <span><i style="border:2px solid var(--muted);background:none"></i>na borda: produtos que mais aparecem junto nos mesmos municípios. Clique para ir até eles</span>
-        </div>
-      </div>
-      <div class="box rd-kit">
-        <h3>Seu kit inicial</h3>
-        <div class="rd-tema" id="rd-tema"></div>
-        <div class="seg" id="rd-abas"></div>
-        <div class="list" id="rd-lista"></div>
-      </div>
-    </div>
-    <div class="box" style="margin-top:var(--s4)">
-      <h2 id="rd-perto-t">Quem está perto</h2>
-      <p class="lede" style="font-size:14px" id="rd-perto-s"></p>
-      <div class="rd-perto" id="rd-perto"></div>
-      <p class="rd-nota" style="margin-top:var(--s3)">Produtores aparecem só somados por município (CNPO, jan. 2026, e SIGORG). Pesquisadores: nomes como assinam publicações e projetos públicos da Embrapa. Entidades: certificadoras, OPAC e OCS cadastradas no MAPA.</p>
-    </div>
-    <details class="rd-sep" id="rd-tabela"><summary><h2 style="display:inline">Todos os municípios e entidades</h2> <span class="rd-nota">tabela completa, no estado e no produto da última rede montada</span></summary>
-    <div class="grid" style="margin-top:var(--s3)">
+    <div class="grid">
       <div class="box">
         <h2>Municípios com produtores orgânicos</h2>
         <p class="lede" style="font-size:14px">CNPO (Cadastro Nacional de Produtores Orgânicos, janeiro de 2026) e SIGORG. Valem os filtros de produto, bioma, região e estado. Tema, tipo e ano não se aplicam a produtores.</p>
@@ -352,7 +372,6 @@ td.num{text-align:right;font-family:var(--f-mono);font-size:13px}
         <div class="tbl"><table><thead><tr><th>Entidade</th><th>Tipo</th><th>Produtores</th></tr></thead><tbody id="ent"></tbody></table></div>
       </div>
     </div>
-    </details>
   </section>
 
   <section class="panel" id="p-conversa" role="tabpanel" aria-labelledby="t-conversa">
@@ -681,7 +700,7 @@ const esc = s => String(s??"").replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">
 function showTab(p){
   document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected", t.dataset.p===p));
   document.querySelectorAll(".panel").forEach(s=>s.classList.toggle("on", s.id==="p-"+p));
-  $("#filters").hidden = p==="sobre" || p==="conversa" || p==="produtores";
+  $("#filters").hidden = p==="sobre" || p==="conversa" || p==="rede";
   if (p==="produtores" && typeof desenharConstelacao==="function" && D) desenharConstelacao();
 }
 
@@ -892,20 +911,62 @@ function initRede(){
   $("#rd-uf").onchange = e=>{ R.uf = e.target.value; R.mun = ""; $("#rd-mun").value = ""; R.ex=null; listaMuns(); redeTudo(); };
   $("#rd-mun").onchange = e=>{ const v = e.target.value.trim(); const m = MUNS.find(x=>norm(x)===norm(v)) || MUNS.find(x=>norm(x).startsWith(norm(v)+"-") && (!R.uf || x.endsWith("-"+R.uf)));
     R.mun = m || ""; if (m){ e.target.value = m; R.uf = m.slice(-2); $("#rd-uf").value = R.uf; } R.ex=null; redeTudo(); };
-  $("#rd-add").onchange = e=>{ const k = pIdx(e.target.value.trim()); if (k >= 0 && !R.prods.includes(k)){ R.prods.push(k); R.foco = k; R.ex=null; redeTudo(); } e.target.value = ""; };
-  let t; $("#rd-texto").oninput = e=>{ clearTimeout(t); t = setTimeout(()=>{ R.texto = e.target.value; mostrarDetectado(); }, 300); };
+  $("#rd-add").onchange = e=>{ const k = pIdx(e.target.value.trim()); if (k >= 0){ R.off = (R.off||[]).filter(x=>x!==k); } if (k >= 0 && !R.prods.includes(k)){ R.prods.push(k); R.foco = k; R.ex=null; redeTudo(); } e.target.value = ""; };
+  let t1, t2; $("#rd-texto").oninput = e=>{ R.texto = e.target.value; clearTimeout(t1); clearTimeout(t2);
+    t1 = setTimeout(mostrarDetectado, 250);
+    t2 = setTimeout(()=>{ aplicarTexto(); R.ex = null; redeTudo(); }, 900); };
+  iniciarVoz();
   $("#rd-montar").onclick = ()=>{ R.texto = $("#rd-texto").value; R.tema = ""; R.aba = ""; aplicarTexto(); R.ex=null; redeTudo(true);
     sincronizar(); $("#rd-resumo").scrollIntoView({behavior:"smooth", block:"nearest"}); };
-  $("#rd-limpar").onclick = ()=>{ R = {texto:"", ator:"", uf:"", mun:"", prods:[], gar:"", tema:"", int:"", foco:null, aba:"", ex:null}; $("#rd-texto").value = ""; $("#rd-uf").value = ""; $("#rd-mun").value = ""; listaMuns(); redeTudo(true); };
+  $("#rd-limpar").onclick = ()=>{ R = {texto:"", ator:"", uf:"", mun:"", prods:[], tp:[], off:[], gar:"", tema:"", int:"", foco:null, aba:"", ex:null}; $("#rd-texto").value = ""; $("#rd-uf").value = ""; $("#rd-mun").value = ""; listaMuns(); redeTudo(true); };
   const salvo = LS.get("organicos-rede-perfil", null);
   if (salvo && (salvo.prods||[]).every(k=>D.produtos[k])){ R = {...R, ...salvo, ex:null}; preencherForm(); redeTudo(); } else usarExemplo(1);
 }
 function sincronizar(){ setF({uf:R.uf, produto:R.foco!=null ? String(R.foco) : "", bioma:"", regiao:""}); }
+/* voz: falar em vez de escrever (reconhecimento do próprio navegador) e ouvir os primeiros resultados */
+function iniciarVoz(){
+  const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (Rec){
+    $("#rd-falar").hidden = false; $("#rd-vozNota").hidden = false;
+    let rec = null;
+    const estado = on => { $("#rd-falar").setAttribute("aria-pressed", on); $("#rd-falarRot").textContent = on ? "Ouvindo… toque para parar" : "Falar em vez de escrever"; };
+    $("#rd-falar").onclick = ()=>{
+      if (rec){ rec.stop(); return; }
+      rec = new Rec(); rec.lang = "pt-BR"; rec.interimResults = true; rec.continuous = true;
+      // falar começa um perfil novo
+      R = {...R, texto:"", ator:"", uf:"", mun:"", prods:[], tp:[], off:[], gar:"", tema:"", int:"", foco:null, aba:"", ex:null}; $("#rd-texto").value = ""; preencherForm(); redeTudo();
+      rec.onresult = e=>{
+        // no Android cada resultado repete a frase toda; no computador, cada um é um trecho novo
+        let fala = "";
+        for (let i = 0; i < e.results.length; i++){ const t = e.results[i][0].transcript.trim(); if (!t) continue;
+          if (norm(t).startsWith(norm(fala))) fala = t; else if (!norm(fala).endsWith(norm(t))) fala += " " + t; }
+        $("#rd-texto").value = fala.trim(); $("#rd-texto").dispatchEvent(new Event("input"));
+      };
+      rec.onerror = e=>{ $("#rd-vozNota").textContent = e.error === "not-allowed" || e.error === "service-not-allowed" ? "O navegador não deixou usar o microfone. Libere o microfone para esta página e tente de novo." : e.error === "no-speech" ? "Não ouvi nada. Toque e fale de novo." : "Não deu para ouvir agora. Tente de novo ou escreva."; };
+      rec.onend = ()=>{ rec = null; estado(false); };
+      try { rec.start(); estado(true); } catch(err){ rec = null; }
+    };
+  }
+  if (window.speechSynthesis){
+    const fala = window.speechSynthesis; $("#rd-ouvir").hidden = false;
+    const est = on => { $("#rd-ouvir").setAttribute("aria-pressed", on); $("#rd-ouvirRot").textContent = on ? "Parar de ouvir" : "Ouvir os primeiros resultados"; };
+    $("#rd-ouvir").onclick = ()=>{
+      if (fala.speaking){ fala.cancel(); est(false); return; }
+      const itens = [...document.querySelectorAll("#rd-lista .item a")].slice(0,5).map(a=>a.textContent.replace(/\.$/,""));
+      const aba = ($("#rd-abas button[aria-pressed=true]")||{}).textContent || "";
+      const partes = [itens.length ? `${itens.length===1?"Um resultado":`Os ${itens.length} primeiros resultados`} em ${aba.replace(/\s*\d+$/,"").toLowerCase()}${R.foco!=null?", sobre "+curto(R.foco).toLowerCase():""}.` : "Nenhum resultado nesta aba."];
+      itens.forEach((t,j)=>partes.push(`${j+1}. ${t}.`));
+      const u = new SpeechSynthesisUtterance(partes.join(" ")); u.lang = "pt-BR"; u.rate = .95;
+      const voz = fala.getVoices().find(v=>v.lang && v.lang.replace("_","-").toLowerCase()==="pt-br"); if (voz) u.voice = voz;
+      u.onend = u.onerror = ()=>est(false); fala.cancel(); fala.speak(u); est(true);
+    };
+  }
+}
 function listaMuns(){ $("#rd-muns").innerHTML = MUNS.filter(m=>!R.uf || m.endsWith("-"+R.uf)).map(m=>`<option value="${esc(m)}">`).join(""); }
-function preencherForm(){ $("#rd-texto").value = R.texto; $("#rd-uf").value = R.uf; $("#rd-mun").value = R.mun; listaMuns(); }
+function preencherForm(){ if ($("#rd-texto").value !== R.texto) $("#rd-texto").value = R.texto; $("#rd-uf").value = R.uf; $("#rd-mun").value = R.mun; listaMuns(); }
 function usarExemplo(n){
   const e = REDE_EX[n]; const prods = e.p.map(pIdx).filter(k=>k>=0);
-  R = {texto:e.texto, ator:e.ator, uf:e.uf, mun:e.mun, prods, gar:e.gar, tema:"", int:detectar(e.texto).tema, foco:prods[0]??null, aba:"", ex:n};
+  R = {texto:e.texto, ator:e.ator, uf:e.uf, mun:e.mun, prods, tp:detectar(e.texto).prods, off:[], gar:e.gar, tema:"", int:detectar(e.texto).tema, foco:prods[0]??null, aba:"", ex:n};
   preencherForm(); redeTudo();
 }
 // lê o texto livre: produtos (vários), estado, município, quem é, garantia e tema
@@ -933,12 +994,15 @@ function mostrarDetectado(){
   if (d.mun) p.push(d.mun); else if (d.uf) p.push(D.ufs[d.uf][0]);
   if (d.gar) p.push(GARANTIAS.find(g=>g[0]===d.gar)[1]);
   if (d.tema) p.push(TAX[d.tema].toLowerCase());
-  $("#rd-det").innerHTML = R.texto.trim() ? (p.length ? `Entendi: <b>${esc(p.join(" · "))}</b>. Clique em "Montar minha rede".` : "Não reconheci produto nem lugar. Use os campos abaixo.") : "";
+  $("#rd-det").innerHTML = R.texto.trim() ? (p.length ? `Entendi: <b>${esc(p.join(" · "))}</b>. Já marquei nos campos abaixo.` : "Ainda não reconheci produto nem lugar. Continue escrevendo ou use os campos abaixo.") : "";
 }
 function aplicarTexto(){
-  const d = detectar(R.texto||"");
-  d.prods.forEach(k=>{ if (!R.prods.includes(k)) R.prods.push(k); });
-  if (d.prods.length) R.foco = d.prods[0];
+  const d = detectar(R.texto||""), antes = R.tp || [];
+  // produtos do texto substituem os que vieram do texto antes; os escolhidos à mão ficam
+  R.prods = R.prods.filter(k => !antes.includes(k) || d.prods.includes(k));
+  d.prods.forEach(k=>{ if (!R.prods.includes(k) && !(R.off||[]).includes(k)) R.prods.push(k); });
+  if (d.prods.join() !== antes.join()){ if (d.prods.length) R.foco = d.prods[0]; R.tema = ""; R.aba = ""; }
+  R.tp = d.prods;
   if (d.uf){ R.uf = d.uf; R.mun = d.mun || (R.mun.endsWith("-"+d.uf) ? R.mun : ""); }
   if (d.ator) R.ator = d.ator; if (d.gar) R.gar = d.gar; R.int = d.tema;
   preencherForm();
@@ -967,7 +1031,7 @@ function redeTudo(guardar){
   document.querySelectorAll("#rd-ex button").forEach(b=>b.setAttribute("aria-pressed", +b.dataset.n===R.ex));
   if (R.foco != null && !R.prods.includes(R.foco) && !R.vizFoco) R.foco = R.prods[0] ?? null;
   $("#rd-prods").innerHTML = R.prods.map(k=>`<span class="chip">${esc(curto(k))}<button type="button" data-k="${k}" aria-label="Tirar ${esc(curto(k))}">×</button></span>`).join("") || `<span class="rd-nota">Nenhum ainda.</span>`;
-  $("#rd-prods").querySelectorAll("button").forEach(b=>b.onclick=()=>{ R.prods = R.prods.filter(k=>k!==+b.dataset.k); if (R.foco===+b.dataset.k) R.foco = R.prods[0] ?? null; R.ex=null; redeTudo(); });
+  $("#rd-prods").querySelectorAll("button").forEach(b=>b.onclick=()=>{ R.prods = R.prods.filter(k=>k!==+b.dataset.k); R.off = [...new Set([...(R.off||[]), +b.dataset.k])]; if (R.foco===+b.dataset.k) R.foco = R.prods[0] ?? null; R.ex=null; redeTudo(); });
   mostrarDetectado();
   if (R.ex === null) LS.set("organicos-rede-perfil", {texto:R.texto, ator:R.ator, uf:R.uf, mun:R.mun, prods:R.prods, gar:R.gar, int:R.int, foco:R.foco});
   desenharConstelacao(); desenharKit(); desenharPerto();
@@ -1084,6 +1148,11 @@ function desenharKit(){
     || `<p class="lede" style="font-size:14px;margin-top:var(--s3)">${R.aba==="sv" ? "Nada salvo ainda. Use ☆ salvar nos itens." : "Nada aqui para este recorte. Tente outra aba, tire o tema ou escolha a visão geral."}</p>`;
   $("#rd-lista").querySelectorAll(".salvar").forEach(b=>b.onclick=()=>{ const k = b.dataset.k; SALVOS.has(k) ? SALVOS.delete(k) : SALVOS.add(k); LS.set("organicos-rede-salvos", [...SALVOS]); desenharKit(); });
 }
+const PASSOS = {
+  oc:{t:"Como vender direto como orgânico (OCS)", p:["Junte-se a um grupo de agricultores familiares (associação, cooperativa ou grupo informal) ou forme um.","O grupo se cadastra como OCS no Ministério da Agricultura (MAPA), na superintendência do seu estado.","Os membros visitam as propriedades uns dos outros e cuidam juntos das regras (controle social).","Você vende direto ao consumidor: feira, entrega, na propriedade e compras públicas (PAA, PNAE). Não usa o selo, mas tem a declaração de cadastro."]},
+  op:{t:"Como ter o selo pelo sistema participativo (OPAC)", p:["Procure um núcleo ou grupo ligado a uma OPAC do seu estado (veja ao lado).","Participe das reuniões e das visitas entre agricultores e técnicos.","Faça o plano de manejo orgânico da propriedade, com ajuda do grupo.","Depois do período de transição, a OPAC avalia e libera o selo SisOrg. Com ele, você vende em qualquer lugar."]},
+  ce:{t:"Como ter o selo por certificadora (auditoria)", p:["Escolha uma certificadora credenciada no MAPA (veja ao lado) e peça um orçamento.","Prepare o plano de manejo e os registros da produção.","Receba a inspeção (em geral, uma vez por ano, com custo).","Com o certificado, use o selo SisOrg e venda em qualquer canal."]},
+  nao:{t:"Três caminhos para ser orgânico", p:["OCS: grupo de agricultores familiares que vende direto ao consumidor, sem selo.","OPAC (sistema participativo): o grupo de agricultores e técnicos avalia junto e dá o selo.","Certificadora: uma empresa faz auditoria e dá o selo.","Em todos há um período de transição antes de vender como orgânico."]}};
 function desenharPerto(){
   const k = R.foco, ks = k != null ? String(k) : "", uf = R.uf, nomeUf = uf ? D.ufs[uf][0] : "", em = uf ? (PREP_UF[uf]||"em")+" "+nomeUf : "no Brasil";
   const prodTxt = k != null ? curto(k).toLowerCase() : "orgânicos";
@@ -1092,10 +1161,11 @@ function desenharPerto(){
   const linhas = D.prod.filter(p => (!uf || p.uf === uf) && nProd(p, ks) > 0).sort((a,b)=>nProd(b,ks)-nProd(a,ks));
   const tot = linhas.reduce((s,p)=>s+nProd(p,ks),0);
   const meu = R.mun ? D.prod.find(p=>p.id===R.mun) : null, pos = meu ? linhas.indexOf(meu) : -1;
-  const top = linhas.slice(0,6);
-  let c1 = `<div class="card"><h3>Onde se produz ${esc(prodTxt)}</h3><p class="rd-nota" style="margin:0">${fmt(tot)} produtores em ${fmt(linhas.length)} ${linhas.length===1?"município":"municípios"} ${em}.</p><ol>`
-    + top.map(p=>`<li class="${p===meu?"voce":""}">${esc(p.id)} <small>${fmt(nProd(p,ks))}</small></li>`).join("") + `</ol>`
-    + (R.mun ? (pos>=6 ? `<p style="font-size:14px"><b>${esc(R.mun)}</b>: ${fmt(nProd(meu,ks))} produtores, ${pos+1}º ${uf?"no estado":"no país"}.</p>` : pos<0 ? `<p style="font-size:14px"><b>${esc(R.mun)}</b>: ainda nenhum produtor de ${esc(prodTxt)} cadastrado.</p>` : "") : "")
+  const km = (a, b) => { const r = Math.PI/180, x = (b.lo-a.lo)*r*Math.cos((a.la+b.la)/2*r), y = (b.la-a.la)*r; return Math.round(6371*Math.hypot(x,y)); };
+  const perto = meu ? D.prod.filter(p=>nProd(p,ks)>0).map(p=>({p, d:km(meu,p)})).sort((a,b)=>a.d-b.d).slice(0,6) : linhas.slice(0,6).map(p=>({p}));
+  let c1 = `<div class="card"><h3>${meu?"Quem produz "+esc(prodTxt)+" perto de você":"Onde se produz "+esc(prodTxt)}</h3><p class="rd-nota" style="margin:0">${fmt(tot)} produtores em ${fmt(linhas.length)} ${linhas.length===1?"município":"municípios"} ${em}${meu?". Abaixo, os mais perto de "+esc(R.mun):""}.</p><ol>`
+    + perto.map(({p,d})=>`<li class="${p===meu?"voce":""}">${esc(p.id)} <small>${fmt(nProd(p,ks))}${d!=null?" · "+(d===0?"aqui":d+" km"):""}</small></li>`).join("") + `</ol>`
+    + (R.mun && pos<0 ? `<p style="font-size:14px"><b>${esc(R.mun)}</b>: ainda nenhum produtor de ${esc(prodTxt)} cadastrado.</p>` : "")
     + `<button type="button" class="lk" id="rd-vermapa">Ver no mapa →</button></div>`;
   // garantia
   const ce = linhas.reduce((s,p)=>s+p.ce,0), op = linhas.reduce((s,p)=>s+p.op,0), oc = linhas.reduce((s,p)=>s+p.oc,0);
@@ -1119,7 +1189,9 @@ function desenharPerto(){
     <button type="button" class="lk" id="rd-verpontos">Ver feiras e pontos no mapa →</button>
     <a class="lk" href="../cadastro/">Cadastrar uma feira ou ponto de venda →</a>
     <a class="lk" href="${iagro}" target="_blank" rel="noopener">Ver ${esc(prodTxt)} na Rede iAgro (toda a Embrapa) ↗</a></div>`;
-  $("#rd-perto").innerHTML = c1 + c2 + c3 + c4;
+  const PS = PASSOS[R.gar];
+  const c5 = PS ? `<div class="card"><h3>${PS.t}</h3><ol class="passos">${PS.p.map(x=>`<li>${esc(x)}</li>`).join("")}</ol><a class="lk" href="https://www.gov.br/agricultura/pt-br/assuntos/sustentabilidade/organicos" target="_blank" rel="noopener">Regras oficiais no site do MAPA ↗</a></div>` : "";
+  $("#rd-perto").innerHTML = c1 + c2 + c5 + c3 + c4;
   const filtros = ()=>setF({uf, produto:ks, bioma:"", regiao:"", tema:"", tipo:"", cadeia:"", q:"", a0:"", a1:"", nivel:""});
   $("#rd-vermapa").onclick = ()=>{ filtros(); setCamada("produtores"); render(); showTab("mapa"); scrollTo({top:0}); };
   $("#rd-verpontos").onclick = ()=>{ filtros(); setCamada("pontos"); render(); showTab("mapa"); scrollTo({top:0}); };
@@ -1128,8 +1200,10 @@ function desenharPerto(){
 }
 // #rede abre a aba; #rede/p=cafe,tomate&uf=MG&m=Brasília-DF&t=P2 já monta o perfil
 function lerHashRede(h){
-  showTab("produtores");
-  const q = new URLSearchParams(h.replace(/^rede\/?/,""));
+  showTab("rede");
+  const q = new URLSearchParams(h.replace(/^rede\/?\??/,""));
+  if (q.get("ex") != null && REDE_EX[+q.get("ex")]){ usarExemplo(+q.get("ex")); sincronizar(); return; }
+  if (q.get("q")){ R = {texto:q.get("q"), ator:"", uf:"", mun:"", prods:[], tp:[], off:[], gar:"", tema:"", int:"", foco:null, aba:"", ex:null}; $("#rd-uf").value = ""; $("#rd-mun").value = ""; $("#rd-texto").value = R.texto; R.tema = ""; R.aba = ""; aplicarTexto(); R.ex = null; redeTudo(true); sincronizar(); return; }
   if ([...q.keys()].length){
     const prods = (q.get("p")||"").split(",").map(s=>pIdx(s.trim().replace(/_/g," "))).filter(k=>k>=0);
     const uf = (q.get("uf")||"").toUpperCase();
@@ -1170,7 +1244,9 @@ fetch("../index.html", {method:"HEAD"}).then(r => { if (!r.ok) $("#voltar").hidd
   initRede();
   // #produtor, #extensionista, #pesquisador abrem um perfil; #p=texto abre a conversa já com a pergunta (vem da busca da capa)
   const lerHash = ()=>{ const h = location.hash.slice(1);
-    if (h === "rede" || h.startsWith("rede/") || h.startsWith("rede?") || h === "produtores"){ lerHashRede(h); return; }
+    if (h === "rede" || h.startsWith("rede/") || h.startsWith("rede?")){ lerHashRede(h); return; }
+    if (h.startsWith("aba=")){ const a = h.slice(4); if ($("#p-"+a)){ showTab(a); scrollTo({top:0}); } return; }
+    if (["produtor","extensionista","pesquisador"].includes(h)){ showTab("rede"); R.ator = {produtor:"produtor", extensionista:"tecnico", pesquisador:"pesquisador"}[h]; redeTudo(); return; }
     if (h.startsWith("p=")){ const q = decodeURIComponent(h.slice(2).replace(/\+/g," ")).trim(); if (q){ showTab("conversa"); perguntar(q); } return; }
     aplicarPerfil(h); };
   lerHash();

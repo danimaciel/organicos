@@ -103,6 +103,34 @@ h1 .l2{display:block;font-family:"Playfair Display",Georgia,serif;font-style:ita
 .perfil b{font-family:var(--f-display);font-size:19px;font-weight:700;line-height:1.25}
 .perfil i{font-style:normal;font-family:var(--f-display);font-size:24px;color:var(--c,var(--green));margin-top:auto;padding-top:6px}
 .perfil.p1{--c:var(--ochre)} .perfil.p2{--c:var(--green)} .perfil.p3{--c:var(--ink)} .perfil.p4{--c:var(--muted)}
+/* rede orgânica (substitui os perfis) */
+.rede-cta{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:24px 40px;align-items:center;background:var(--surface);border:1.5px solid var(--line);border-top:6px solid var(--ochre);border-radius:18px;padding:28px}
+@media (max-width:880px){.rede-cta{grid-template-columns:minmax(0,1fr);padding:20px}}
+.rede-txt h2{font-size:clamp(24px,3vw,32px);font-weight:700;margin-top:6px;line-height:1.15}
+.rede-txt > p:last-child{color:var(--muted);margin-top:10px;max-width:46ch}
+.rede-form{display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.rede-form textarea{width:100%;font:17px/1.45 var(--f-body);color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;resize:vertical}
+.rede-form textarea:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.rede-ex{font-size:14px;color:var(--muted)}
+.rede-bts{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.btn-voz{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:12px 18px;cursor:pointer;font:600 15px var(--f-body)}
+.btn-voz:hover{border-color:var(--green)}
+.btn-voz .mic{width:10px;height:14px;border-radius:5px;border:2px solid currentColor;position:relative}
+.btn-voz .mic::after{content:"";position:absolute;left:50%;bottom:-6px;width:2px;height:4px;background:currentColor;transform:translateX(-50%)}
+.btn-voz[aria-pressed="true"]{background:var(--ochre);border-color:var(--ochre);color:#fff}
+@keyframes pulsar{50%{opacity:.35}}
+.btn-voz[aria-pressed="true"] .mic{animation:pulsar 1s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.btn-voz[aria-pressed="true"] .mic{animation:none}}
+.rede-ex a{color:var(--green);font-weight:600}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.direto{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:baseline;margin-top:18px;font-size:15px}
+.direto span{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.direto a{color:var(--ink);font-weight:600;text-decoration:none;border-bottom:1.5px solid var(--line)}
+.direto a:hover{border-color:var(--green);color:var(--green)}
+a.col{text-decoration:none;color:inherit;border-radius:12px;padding:12px;margin:-12px;transition:background .15s}
+a.col:hover{background:var(--surface)}
+a.col .ir{display:inline-block;margin-top:8px;font-weight:600;color:var(--green);font-size:15px}
+.fim .classif{color:var(--muted);font-size:15px}
 .todos{margin-top:14px;font-size:15px;color:var(--muted)}
 .cad-feira{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;margin-top:18px;padding:16px 20px;border-radius:14px;background:var(--ochre-soft);text-decoration:none;color:var(--ink)}
 .cad-feira span{color:var(--green);font-weight:600}
@@ -179,13 +207,20 @@ h1 .l2{display:block;font-family:"Playfair Display",Georgia,serif;font-style:ita
 
 <div class="wrap">
   <section class="sec-perfis">
-    <p class="quem">Ou entre pelo seu caminho</p>
-    <div class="perfis">
-      <a class="perfil p1" href="ambiente/index.html#produtor"><span class="pk">Sou produtor ou produtora</span><b>Técnicas e soluções para o que eu planto ou crio</b><i aria-hidden="true">→</i></a>
-      <a class="perfil p2" href="ambiente/index.html#extensionista"><span class="pk">Sou extensionista</span><b>Onde estão os produtores e que materiais usar</b><i aria-hidden="true">→</i></a>
-      <a class="perfil p3" href="ambiente/index.html#pesquisador"><span class="pk">Sou pesquisador ou pesquisadora</span><b>Onde falta pesquisa e quem já trabalha no tema</b><i aria-hidden="true">→</i></a>
-      <a class="perfil p4" href="ambiente/index.html"><span class="pk">Geral</span><b>Tudo junto: mapa, filtros, cruzamentos e perguntas</b><i aria-hidden="true">→</i></a>
+    <div class="rede-cta">
+      <div class="rede-txt">
+        <p class="quem">Para você</p>
+        <h2>Conte o que você produz ou procura</h2>
+        <p>A página liga seus produtos aos temas que a Embrapa pesquisa, separa materiais para levar ao campo e mostra quem produz, quem garante o selo, quem pesquisa e onde vender perto de você.</p>
+      </div>
+      <form class="rede-form" id="rede-form">
+        <label for="rede-in" class="sr">Conte o que você produz ou procura</label>
+        <textarea id="rede-in" rows="3" placeholder="Ex.: Produzo banana e mandioca em Pernambuco e quero começar a vender em feira."></textarea>
+        <div class="rede-bts"><button class="btn">Começar <span aria-hidden="true">→</span></button><button type="button" class="btn-voz" id="rede-falar" hidden aria-pressed="false"><span class="mic" aria-hidden="true"></span><span id="rede-falarRot">Falar em vez de escrever</span></button></div>
+        <p class="rede-ex">Ou veja um exemplo: <a href="ambiente/index.html#rede?ex=0">café no Sul de Minas</a> · <a href="ambiente/index.html#rede?ex=1">hortaliças no DF</a> · <a href="ambiente/index.html#rede?ex=2">feira na Bahia</a></p>
+      </form>
     </div>
+    <nav class="direto" aria-label="Páginas do ambiente"><span>Ir direto para</span><a href="ambiente/index.html#aba=mapa">Mapa</a><a href="ambiente/index.html#aba=conteudos">Conteúdos</a><a href="ambiente/index.html#aba=cruza">Produção x Ciência</a><a href="ambiente/index.html#aba=pessoas">Pesquisadores</a><a href="ambiente/index.html#aba=produtores">Produtores</a></nav>
     <p class="todos">Funciona no navegador, sem cadastro.</p>
     <a class="cad-feira" href="cadastro/"><b>Conhece uma feira ou loja de orgânicos?</b> <span>Cadastre no mapa "Onde comprar" →</span></a>
   </section>
@@ -212,10 +247,10 @@ h1 .l2{display:block;font-family:"Playfair Display",Georgia,serif;font-style:ita
   <section class="sec">
     <h2>O que você encontra</h2>
     <div class="cols">
-      <div class="col"><span class="k">Mapa</span><h3>Onde as coisas acontecem</h3><p>Estados e municípios com conteúdos da Embrapa e com produtores orgânicos, com camada de biomas.</p></div>
-      <div class="col"><span class="k">Produção × Ciência</span><h3>Onde falta pesquisa</h3><p>62 produtos comparados: quantos produtores declaram cada um e quanto a Embrapa já estudou em sistema orgânico.</p></div>
-      <div class="col"><span class="k">Pessoas</span><h3>Quem trabalha no tema</h3><p>Pesquisadores e pesquisadoras ligados a cada recorte de produto, tema, lugar e período.</p></div>
-      <div class="col"><span class="k">Pergunte</span><h3>Perguntas em palavras simples</h3><p>"Quem pesquisa mel na Caatinga?" O assistente responde com os dados e ajusta o mapa, sem conta e sem enviar nada para fora.</p></div>
+      <a class="col" href="ambiente/index.html#aba=mapa"><span class="k">Mapa</span><h3>Onde as coisas acontecem</h3><p>Estados e municípios com conteúdos da Embrapa e com produtores orgânicos, com camada de biomas.</p><span class="ir">Abrir →</span></a>
+      <a class="col" href="ambiente/index.html#aba=cruza"><span class="k">Produção × Ciência</span><h3>Onde falta pesquisa</h3><p>62 produtos comparados: quantos produtores declaram cada um e quanto a Embrapa já estudou em sistema orgânico.</p><span class="ir">Abrir →</span></a>
+      <a class="col" href="ambiente/index.html#aba=pessoas"><span class="k">Pessoas</span><h3>Quem trabalha no tema</h3><p>Pesquisadores e pesquisadoras ligados a cada recorte de produto, tema, lugar e período.</p><span class="ir">Abrir →</span></a>
+      <a class="col" href="ambiente/index.html#aba=conversa"><span class="k">Pergunte</span><h3>Perguntas em palavras simples</h3><p>"Quem pesquisa mel na Caatinga?" O assistente responde com os dados e ajusta o mapa, sem conta e sem enviar nada para fora.</p><span class="ir">Abrir →</span></a>
     </div>
   </section>
 
@@ -253,6 +288,7 @@ h1 .l2{display:block;font-family:"Playfair Display",Georgia,serif;font-style:ita
 
   <footer class="fim">
     <span>Os números vêm de leitura automática de texto e servem para explorar. Confira o conteúdo original antes de citar.</span>
+    <a class="classif" href="ambiente/index.html#aba=sobre">Como classificamos</a>
     <a class="btn sm" href="ambiente/index.html">Entrar no ambiente →</a>
   </footer>
 </div>
@@ -260,6 +296,19 @@ h1 .l2{display:block;font-family:"Playfair Display",Georgia,serif;font-style:ita
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script>
 if (matchMedia("(max-width:560px)").matches) document.getElementById("busca-in").placeholder = "Pergunte ou busque";
+document.getElementById("rede-form").addEventListener("submit", e => {
+  e.preventDefault(); const q = document.getElementById("rede-in").value.trim();
+  location.href = "ambiente/index.html#rede" + (q ? "?q=" + encodeURIComponent(q) : "");
+});
+(function(){ const Rec = window.SpeechRecognition || window.webkitSpeechRecognition; if (!Rec) return;
+  const b = document.getElementById("rede-falar"), rot = document.getElementById("rede-falarRot"), ta = document.getElementById("rede-in"); b.hidden = false; let rec = null;
+  const nrm = s => (s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+  b.onclick = () => { if (rec){ rec.stop(); return; }
+    rec = new Rec(); rec.lang = "pt-BR"; rec.interimResults = true; rec.continuous = true;
+    rec.onresult = e => { let f = ""; for (let i = 0; i < e.results.length; i++){ const t = e.results[i][0].transcript.trim(); if (!t) continue; if (nrm(t).startsWith(nrm(f))) f = t; else if (!nrm(f).endsWith(nrm(t))) f += " " + t; } ta.value = f.trim(); };
+    rec.onend = () => { rec = null; b.setAttribute("aria-pressed", false); rot.textContent = "Falar em vez de escrever"; };
+    try { rec.start(); b.setAttribute("aria-pressed", true); rot.textContent = "Ouvindo… toque para parar"; } catch(err){ rec = null; } };
+})();
 document.getElementById("busca").addEventListener("submit", e => {
   e.preventDefault(); const q = document.getElementById("busca-in").value.trim();
   location.href = "ambiente/index.html" + (q ? "#p=" + encodeURIComponent(q) : "");
