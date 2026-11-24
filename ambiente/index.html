@@ -136,6 +136,9 @@ td.num{text-align:right;font-family:var(--f-mono);font-size:13px}
 .taxo code{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
 .foot{font-size:13px;color:var(--muted);margin-top:var(--s6)}
 /* ---------- rede do produtor ---------- */
+.aba-intro{margin:var(--s5) 0 var(--s4)}
+.aba-intro .lede{font-size:15px;max-width:78ch}
+.aba-intro .nota{font-size:14px;color:var(--muted);max-width:78ch;margin-top:var(--s2)}
 .rd-head{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);align-items:end;justify-content:space-between;margin-bottom:var(--s4)}
 .rd-head .lede{margin-top:4px}
 .rd-ex{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
@@ -246,7 +249,7 @@ td.num{text-align:right;font-family:var(--f-mono);font-size:13px}
   <section class="panel on" id="p-rede" role="tabpanel" aria-labelledby="t-rede">
     <div class="rd-head">
       <div><h2>Para você</h2>
-        <p class="lede" style="font-size:15px">Conte quem você é, onde está e o que produz. A página liga seus produtos aos temas que a Embrapa pesquisa, monta um kit de leitura e mostra quem produz, quem garante o selo e quem pesquisa perto de você.</p></div>
+        <p class="lede" style="font-size:15px;max-width:78ch">Conte quem você é, onde está e o que produz. A página liga seus produtos aos temas que a Embrapa pesquisa, monta um kit de leitura e mostra quem produz, quem garante o selo e quem pesquisa perto de você. Usa as mesmas bases das outras abas. Os filtros do alto não valem aqui: vale o que você contar no perfil.</p></div>
       <div class="rd-ex" id="rd-ex"><span>Exemplos</span></div>
     </div>
     <div class="rede">
@@ -294,6 +297,7 @@ td.num{text-align:right;font-family:var(--f-mono);font-size:13px}
   </section>
 
   <section class="panel" id="p-mapa" role="tabpanel" aria-labelledby="t-mapa">
+    <div class="aba-intro"><h2>Onde as coisas acontecem</h2><p class="lede">O mapa mostra, por estado e município, o que você escolher: conteúdos da Embrapa sobre orgânicos e agroecologia, produtores orgânicos, grupos de venda direta (OCS) ou pontos de venda cadastrados no site. Os conteúdos vêm das bases da Embrapa (setembro de 2026), os produtores do CNPO (janeiro de 2026) e do SIGORG, e os pontos de venda do cadastro "Onde comprar". Para os conteúdos valem todos os filtros. Para produtores e pontos de venda valem os filtros de lugar e a busca por palavra, e para produtores também o produto.</p></div>
     <div class="grid">
       <div class="box">
         <div class="maptools">
@@ -324,6 +328,7 @@ td.num{text-align:right;font-family:var(--f-mono);font-size:13px}
   </section>
 
   <section class="panel" id="p-conteudos" role="tabpanel" aria-labelledby="t-conteudos">
+    <div class="aba-intro"><h2>Conteúdos da Embrapa</h2><p class="lede">A lista mostra as publicações, os projetos e as soluções tecnológicas da Embrapa ligados a orgânicos e agroecologia, com as culturas, os contextos e as Unidades que mais aparecem. Eles vêm das bases públicas da Embrapa (setembro de 2026), lidas e classificadas automaticamente. Todos os filtros valem aqui.</p></div>
     <div class="grid">
       <div class="box"><h2 id="lst-title">Conteúdos</h2><div class="list" id="lst"></div><button class="btn more" id="lst-more">Mostrar mais</button></div>
       <div class="box"><h2>Recortes</h2>
@@ -335,10 +340,9 @@ td.num{text-align:right;font-family:var(--f-mono);font-size:13px}
   </section>
 
   <section class="panel" id="p-cruza" role="tabpanel" aria-labelledby="t-cruza">
+    <div class="aba-intro"><h2>O que se produz e o que se pesquisa</h2><p class="lede">A tabela mostra, para cada produto, quantos produtores orgânicos o declaram e quantos conteúdos da Embrapa sobre orgânicos e agroecologia falam dele. Os produtores vêm do CNPO (janeiro de 2026) e do SIGORG, e os conteúdos das bases da Embrapa (setembro de 2026). Os filtros de lugar valem para os dois lados. Tema, tipo e ano valem só para os conteúdos.</p><p class="nota"><b>Como ler a situação.</b> Para cada produto, dividimos os produtores pelos conteúdos. Depois comparamos com o produto típico do recorte, que hoje tem <b id="cz-med">63</b> produtores por conteúdo (a mediana). Quando passa do triplo disso, é <b>pouca pesquisa orgânica</b>. Quando fica abaixo de um terço, é <b>muita pesquisa</b>. Entre os dois, é <b>equilibrado</b>. A coluna "Toda a Embrapa" mostra quanto a Embrapa pesquisa o produto em qualquer sistema de produção.</p></div>
     <div class="box">
-      <h2>O que se produz e o que se pesquisa</h2>
-      <p class="lede" style="font-size:14px">Para cada produto: quantos produtores orgânicos o declaram (CNPO e SIGORG) e quantos conteúdos da Embrapa sobre orgânicos e agroecologia falam dele. Os filtros de lugar valem para os dois lados; tema, tipo e ano valem só para os conteúdos. A coluna "Toda a Embrapa" mostra quanto a Embrapa pesquisa o produto em qualquer sistema de produção.</p>
-      <div class="seg" id="cz-ord" style="margin-top:12px">
+      <div class="seg" id="cz-ord">
         <button aria-pressed="true" data-v="prod">Ordenar por produtores</button><button aria-pressed="false" data-v="lac">Maiores lacunas</button><button aria-pressed="false" data-v="cie">Mais pesquisados</button>
       </div>
       <div class="sub">Cada ponto é um produto (escala logarítmica). Abaixo da linha: muita produção para pouca pesquisa orgânica.</div>
@@ -348,19 +352,18 @@ td.num{text-align:right;font-family:var(--f-mono);font-size:13px}
   </section>
 
   <section class="panel" id="p-pessoas" role="tabpanel" aria-labelledby="t-pessoas">
+    <div class="aba-intro"><h2>Pesquisadores e pesquisadoras do tema</h2><p class="lede">A tabela mostra quem assina os conteúdos do recorte ou lidera os projetos, com a Unidade e o período em que trabalhou no tema. Os nomes vêm do cadastro de autores da Embrapa, ligados às publicações e aos projetos (setembro de 2026). Todos os filtros valem aqui.</p><p class="nota">Nomes com <b>*</b> têm a mesma forma de citação de outra pessoa, então a contagem pode incluir trabalhos de um homônimo.</p></div>
     <div class="box">
-      <h2>Pesquisadores e pesquisadoras do tema</h2>
-      <p class="lede" style="font-size:14px">Pessoas do cadastro de autores da Embrapa que assinam os conteúdos do recorte (ou lideram os projetos). Todos os filtros valem aqui. Nomes com <b>*</b> têm a mesma forma de citação de outra pessoa, então a contagem pode incluir trabalhos de um homônimo.</p>
-      <div class="tbl" style="margin-top:12px"><table><thead><tr><th>Nome</th><th>Unidade</th><th>Situação</th><th>Publicações diretas</th><th>Afins</th><th>Projetos liderados</th><th>Em execução</th><th>Período</th></tr></thead><tbody id="pes"></tbody></table></div>
+      <div class="tbl"><table><thead><tr><th>Nome</th><th>Unidade</th><th>Situação</th><th>Publicações diretas</th><th>Afins</th><th>Projetos liderados</th><th>Em execução</th><th>Período</th></tr></thead><tbody id="pes"></tbody></table></div>
       <button class="btn more" id="pes-more">Mostrar mais</button>
     </div>
   </section>
 
   <section class="panel" id="p-produtores" role="tabpanel" aria-labelledby="t-produtores">
+    <div class="aba-intro"><h2>Produtores orgânicos</h2><p class="lede">A tabela mostra quantos produtores orgânicos há em cada município, como garantem o selo e quais entidades os acompanham. Os dados vêm do CNPO (Cadastro Nacional de Produtores Orgânicos, janeiro de 2026) e do SIGORG, somados por município e sem nomes de produtores. Valem os filtros de produto, de lugar e a busca por palavra. Tema, tipo e ano não se aplicam a produtores.</p></div>
     <div class="grid">
       <div class="box">
         <h2>Municípios com produtores orgânicos</h2>
-        <p class="lede" style="font-size:14px">CNPO (Cadastro Nacional de Produtores Orgânicos, janeiro de 2026) e SIGORG. Valem os filtros de produto, bioma, região e estado. Tema, tipo e ano não se aplicam a produtores.</p>
         <div class="tbl" style="margin-top:12px"><table><thead><tr><th>Município</th><th>Bioma</th><th id="prd-col">Total</th><th>CNPO</th><th>SIGORG</th><th>Por auditoria</th><th>Participativo</th><th>Venda direta</th><th>Principais produtos</th></tr></thead><tbody id="prd"></tbody></table></div>
         <button class="btn more" id="prd-more">Mostrar mais</button>
       </div>
@@ -375,9 +378,8 @@ td.num{text-align:right;font-family:var(--f-mono);font-size:13px}
   </section>
 
   <section class="panel" id="p-conversa" role="tabpanel" aria-labelledby="t-conversa">
+    <div class="aba-intro"><h2>Pergunte em palavras simples</h2><p class="lede" id="chat-note">Escreva uma pergunta e o assistente responde com os dados desta página, ajustando o mapa e os filtros. Ele usa as mesmas bases das outras abas e faz as contas no seu navegador, sem conta e sem enviar nada para fora. Ele entende produtos, lugares, temas, tipos de conteúdo e períodos.</p></div>
     <div class="box chat">
-      <h2>Pergunte em palavras simples</h2>
-      <p class="lede" style="font-size:14px" id="chat-note">As respostas saem dos mesmos dados desta página, calculadas no seu navegador, sem conta e sem enviar nada para fora. O assistente reconhece produtos, lugares, temas, tipos e períodos e ajusta o mapa e os filtros.</p>
       <div class="sugs" id="sugs">
         <button>O que a Embrapa tem sobre café orgânico?</button>
         <button>Quem pesquisa agroecologia na Caatinga?</button>
@@ -391,8 +393,8 @@ td.num{text-align:right;font-family:var(--f-mono);font-size:13px}
   </section>
 
   <section class="panel" id="p-sobre" role="tabpanel" aria-labelledby="t-sobre">
+    <div class="aba-intro"><h2>Como classificamos</h2><p class="lede">Esta aba explica como cada conteúdo entrou na base, como ligamos lugares, produtos e pessoas, e de onde vem cada número. Vale para todas as outras abas.</p></div>
     <div class="box prose">
-      <h2>Como classificamos</h2>
       <p>Lemos o título, as palavras-chave e o resumo (ou a descrição) de cada publicação, projeto e solução tecnológica da Embrapa (bases de setembro de 2026) e procuramos termos de uma taxonomia em quatro grupos.</p>
       <ul>
         <li><b>Ligação direta</b>: o texto fala de produção orgânica, agroecologia, outras correntes de base ecológica ou certificação de orgânicos.</li>
@@ -664,6 +666,7 @@ function cruza(){
   const rows = D.produtos.map((p,k)=>({k, ...p, prod: totProd(String(k)), cie: cont[k]||0})).filter(r=>r.prod>0 || r.cie>0);
   rows.forEach(r=>r.raz = r.prod/Math.max(1,r.cie));
   const med = d3.median(rows.filter(r=>r.prod>0), r=>r.raz) || 1;
+  const cm = $("#cz-med"); if (cm) cm.textContent = fmt(Math.round(med));
   rows.forEach(r=>r.sit = r.prod===0 ? ["mu","Sem produtores no recorte"] : r.raz > med*3 ? ["lac","Pouca pesquisa orgânica"] : r.raz < med/3 ? ["ok","Muita pesquisa"] : ["mu","Equilibrado"]);
   const ord = {prod:(a,b)=>b.prod-a.prod, lac:(a,b)=>b.raz-a.raz || b.prod-a.prod, cie:(a,b)=>b.cie-a.cie}[czOrd];
   rows.sort(ord);
