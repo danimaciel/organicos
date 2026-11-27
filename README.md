@@ -25,6 +25,19 @@ Tudo roda no navegador, sem servidor e sem cadastro. O assistente "Pergunte" é 
 
 Os arquivos de origem (bases da Embrapa de setembro de 2026, CNPO de janeiro de 2026, SIGORG e lista do IBGE) não estão no repositório. A lista de produtores um a um (`produtores_organicos.csv`, gerada pelo script 05) também fica de fora, por trazer nomes e documentos; o site usa só contagens por município e produto. Para refazer, coloque-os numa pasta e ajuste os caminhos no topo de cada script.
 
+## Atualização automática do CNPO
+
+A tarefa `.github/workflows/atualizar-cnpo.yml` roda nos dias 6, 16 e 26 (o Ministério atualiza o CNPO nos dias 5, 15 e 25). Ela:
+
+1. procura a planilha mais nova na [página do CNPO](https://www.gov.br/agricultura/pt-br/assuntos/sustentabilidade/organicos/cadastro-nacional-de-produtores-organicos-cnpo) e baixa (`scripts/10_atualizar_cnpo.py baixar`);
+2. para se a planilha for igual à última usada (`dados/fontes.json`);
+3. confere as colunas e o número de linhas, roda os scripts 05, 07 e 06 e confere se os produtores foram ligados aos municípios;
+4. abre um pedido de mudança com o resumo (quantos entraram e saíram, por tipo e por estado). O site só muda quando o pedido é aprovado. Se algo der errado, abre um aviso (issue) e não muda nada.
+
+A planilha e a lista de produtores um a um ficam só na máquina temporária da tarefa. `dados/cnpo_chaves.txt` guarda um código embaralhado por produtor, só para contar entradas e saídas. O SIGORG não tem planilha pública: `referencias/sigorg_sem_identificacao.csv` guarda a última carga sem nome, documento e contato. Para rodar na mão: aba Actions > Atualizar CNPO > Run workflow.
+
+Os scripts aceitam caminhos por variáveis: `ORG_BASE` (pasta do repositório), `ORG_SRC` (bases de origem), `ORG_PRIVADO` (lista de produtores um a um) e `ORG_CNPO` (planilha do CNPO).
+
 ## Limites
 
 Os números vêm de leitura automática de texto e servem para explorar. Só parte dos conteúdos cita o lugar onde o trabalho foi feito. Autores com a mesma forma de citação de outra pessoa aparecem marcados com `*`. Um produtor que declara vários produtos conta uma vez em cada um. Confira o conteúdo original antes de citar.

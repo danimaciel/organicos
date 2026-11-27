@@ -4,7 +4,9 @@ from shapely.geometry import MultiPolygon, Polygon
 from shapely.geometry.polygon import orient
 def horario(g):  # d3-geo espera anel externo no sentido horário
     return MultiPolygon([orient(p, -1.0) for p in g.geoms]) if g.geom_type == "MultiPolygon" else orient(g, -1.0) if g.geom_type == "Polygon" else g
-B = "/mnt/project-files/embrapa-organicos/"; D, R, A = B + "dados/", B + "referencias/", B + "ambiente/"
+import os
+B = os.environ.get("ORG_BASE", "/mnt/project-files/embrapa-organicos/").rstrip("/") + "/"; D, R, A = B + "dados/", B + "referencias/", B + "ambiente/"
+PRIV = os.environ.get("ORG_PRIVADO", D).rstrip("/") + "/"
 tax = json.load(open(R + "taxonomia.json"))
 cads = [c["nome"] for c in tax["cadeias"]]
 def lst(v): return [x for x in str(v).split(";") if x and x != "nan"]
@@ -34,7 +36,7 @@ for tipo, f, tit, sub, unid, ano, url in [("P", "publicacoes", "Título", "Tipo 
 pes = [{"nome": (r.nome.title() if isinstance(r.nome, str) else ""), "af": r.afiliacao if isinstance(r.afiliacao, str) else "", "at": r.ativo == "Sim",
         "h": bool(r.homonimo) if not pd.isna(r.homonimo) else False} for r in pes_all.itertuples()]
 pm = pd.read_csv(D + "produtores_por_municipio.csv")
-po = pd.read_csv(D + "produtores_organicos.csv", dtype=str)
+po = pd.read_csv(PRIV + "produtores_organicos.csv", dtype=str)
 po = po[po.id_local.notna()].assign(produtos=lambda x: x.produtos.fillna("").str.split(";")).explode("produtos")
 po = po[po.produtos != ""]
 pc = po.groupby(["id_local", "produtos"]).size()
@@ -44,7 +46,7 @@ for (m, k), n in pc.items(): pc_d.setdefault(m, {})[k] = int(n)
 ocs = po[po.tipo.str.startswith("OCS")]
 po_d = {}
 for (m, k), n in ocs.groupby(["id_local", "produtos"]).size().items(): po_d.setdefault(m, {})[k] = int(n)
-og = pd.read_csv(D + "produtores_organicos.csv", dtype=str)
+og = pd.read_csv(PRIV + "produtores_organicos.csv", dtype=str)
 og = og[og.id_local.notna() & og.tipo.str.startswith("OCS")]
 og_d = {m: [e.strip().title() for e in g.entidade.value_counts().index[:4]] for m, g in og.groupby("id_local")}
 prod = [{"id": r.id_local, "uf": r.uf, "rg": r.regiao, "b": r.bioma_predominante, "la": round(r.latitude, 3), "lo": round(r.longitude, 3),

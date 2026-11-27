@@ -1,0 +1,16 @@
+{
+ "cnpo": {
+  "arquivo": "CNPO.xlsx (planilha de jan/2026 usada na primeira versão)",
+  "url": "https://www.gov.br/agricultura/pt-br/assuntos/sustentabilidade/organicos/cadastro-nacional-de-produtores-organicos-cnpo",
+  "data_arquivo": "",
+  "sha256": "83cd1dd73a1dfb09bec8b4cf8ec70c44fb59108420098f8b628fa6a627dfb4cc",
+  "linhas": 22365,
+  "referencia": "2026-jan.",
+  "baixado_em": ""
+ },
+ "sigorg": {
+  "arquivo": "SIGORG.xlsx (carga manual)",
+  "observacao": "O MAPA não publica planilha do SIGORG; referencias/sigorg_sem_identificacao.csv guarda a última carga sem nome, documento e contato.",
+  "linhas": 22563
+ }
+}
