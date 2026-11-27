@@ -31,8 +31,8 @@ jobs:
     timeout-minutes: 30
     env:
       ORG_BASE: ${{ github.workspace }}
-      ORG_SRC: ${{ runner.temp }}/origem
-      ORG_PRIVADO: ${{ runner.temp }}/privado
+      ORG_SRC: /tmp/origem
+      ORG_PRIVADO: /tmp/privado
       GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
