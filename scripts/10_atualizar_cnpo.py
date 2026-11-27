@@ -22,7 +22,7 @@ CNPO = os.environ.get("ORG_CNPO", SRC + "CNPO.xlsx")
 FONTES, CHAVES, RESUMO = B + "dados/fontes.json", B + "dados/cnpo_chaves.txt", B + "resumo_cnpo.md"
 COLUNAS = ["Tipo de Entidade", "Entidade", "País", "UF", "Cidade", "Situação", "CNPF_CNPJ_NIF", "Nome do Produtor",
            "Escopo", "Atividade", "Contato", "Ano", "Mês"]
-UA = {"User-Agent": "Mozilla/5.0 (atualizacao-organicos)"}
+UA = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"}
 
 
 def saida(**kv):  # passa valores para os próximos passos do GitHub Actions
@@ -46,8 +46,22 @@ def chaves(df):
     return set(k.map(lambda x: hashlib.sha1(x.encode()).hexdigest()[:12]))
 
 
+def pegar(url, timeout=120):
+    """Baixa com até 4 tentativas; se o Python falhar, tenta o curl (outro jeito de conectar)."""
+    import time
+    erro = None
+    for n in range(4):
+        try:
+            return urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=timeout).read()
+        except Exception as e:
+            erro = e; print(f"tentativa {n + 1} falhou: {e}"); time.sleep(10 * (n + 1))
+    r = subprocess.run(["curl", "-sSfL", "--retry", "3", "--max-time", str(timeout), "-A", UA["User-Agent"], url], capture_output=True)
+    if r.returncode == 0: return r.stdout
+    raise RuntimeError(f"{erro} | curl: {r.stderr.decode().strip()}")
+
+
 def baixar():
-    html = urllib.request.urlopen(urllib.request.Request(PAGINA, headers=UA), timeout=60).read().decode("utf-8", "ignore")
+    html = pegar(PAGINA, 60).decode("utf-8", "ignore")
     links = sorted(set(re.findall(r'href="([^"]*cnpo-mapa[^"]*\.xlsx)"', html, re.I)))
     if not links:
         falha(f"Não achei o link da planilha na [página do CNPO]({PAGINA}). O Ministério pode ter mudado a página.")
@@ -57,7 +71,7 @@ def baixar():
     url = max(links, key=data)
     url = url if url.startswith("http") else "https://www.gov.br" + url
     os.makedirs(os.path.dirname(CNPO), exist_ok=True)
-    corpo = urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=180).read()
+    corpo = pegar(url, 180)
     open(CNPO, "wb").write(corpo)
     sha = hashlib.sha256(corpo).hexdigest()
     antes = ler_fontes().get("cnpo", {})
@@ -126,4 +140,9 @@ def resumir():
 
 
 if __name__ == "__main__":
-    {"baixar": baixar, "resumir": resumir}[sys.argv[1]]()
+    try:
+        {"baixar": baixar, "resumir": resumir}[sys.argv[1]]()
+    except SystemExit:
+        raise
+    except Exception as e:  # qualquer erro vira aviso em linguagem simples, com o detalhe técnico
+        falha(f"A tarefa parou com um erro ao {'baixar a planilha' if sys.argv[1] == 'baixar' else 'conferir o resultado'}: `{type(e).__name__}: {e}`")
