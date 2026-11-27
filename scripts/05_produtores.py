@@ -1,7 +1,12 @@
 """Integra CNPO (Cadastro Nacional de Produtores Orgânicos, MAPA) e SIGORG: produtores, entidades
 (certificadoras, OPAC e OCS) e resumo por município, ligado à base IBGE (região e bioma)."""
 import re, unicodedata, pandas as pd
-SRC, REF, DADOS = "/mnt/project-files/Orgânicos/", "/mnt/project-files/embrapa-organicos/referencias/", "/mnt/project-files/embrapa-organicos/dados/"
+import os
+_B = os.environ.get("ORG_BASE", "/mnt/project-files/embrapa-organicos/").rstrip("/") + "/"
+_SRC = os.environ.get("ORG_SRC", "/mnt/project-files/Orgânicos/").rstrip("/") + "/"
+SRC, REF, DADOS = _SRC, _B + "referencias/", _B + "dados/"
+# lista de produtores um a um (nomes e documentos): fica fora do repositório
+PRIV = os.environ.get("ORG_PRIVADO", DADOS).rstrip("/") + "/"
 def norm(s): return re.sub(r"[\s\-']+", " ", unicodedata.normalize("NFKD", str(s)).encode("ascii", "ignore").decode().upper()).strip()
 mun = pd.read_csv(REF + "municipios_ibge_bioma.csv")
 mun["chave"] = mun.municipio.map(norm) + "|" + mun.uf
@@ -36,12 +41,21 @@ def escopos(t):
     return ";".join(e)
 TIPO = {"CERTIFICADORA": "Certificadora (auditoria)", "CERT": "Certificadora (auditoria)", "OPAC": "OPAC (sistema participativo)", "OCS": "OCS (venda direta)"}
 
-c = pd.read_excel(SRC + "CNPO.xlsx", dtype=str)
+c = pd.read_excel(os.environ.get("ORG_CNPO", SRC + "CNPO.xlsx"), dtype=str)
 c = c.assign(fonte="CNPO", tipo=c["Tipo de Entidade"].map(TIPO), escopo=c.Escopo.map(escopos), situacao=c["Situação"].str.title(),
              atividades=c.Atividade.fillna("").str.replace(r";\s*$", "", regex=True), referencia=c.Ano + "-" + c["Mês"])
 c = c.rename(columns={"CNPF_CNPJ_NIF": "documento", "Nome do Produtor": "produtor", "País": "pais"})
 
-s = pd.read_excel(SRC + "SIGORG.xlsx", dtype=str)
+# SIGORG: planilha original se houver; senão, a cópia sem nome, documento e contato guardada no repositório
+SIG_REDUZIDO = REF + "sigorg_sem_identificacao.csv"
+if os.path.exists(SRC + "SIGORG.xlsx"):
+    s = pd.read_excel(SRC + "SIGORG.xlsx", dtype=str)
+    import hashlib
+    chave = (s["CPF/CNPJ"].fillna("") + "|" + s["Nome do Produtor"].fillna("")).map(lambda x: hashlib.sha1(x.encode()).hexdigest()[:12])
+    s.drop(columns=["CPF/CNPJ", "Nome do Produtor", "Contato"]).assign(chave=chave).to_csv(SIG_REDUZIDO, index=False)
+else:
+    s = pd.read_csv(SIG_REDUZIDO, dtype=str)
+    s["CPF/CNPJ"], s["Nome do Produtor"] = s.chave, s.chave
 s["escopo"] = s.Escopo.map(escopos)
 s = s.groupby(["Tipo de entidade", "Entidade", "País", "UF", "Cidade", "CPF/CNPJ", "Nome do Produtor"], dropna=False).agg(
     escopo=("escopo", lambda x: ";".join(sorted(set(";".join(x).split(";")) - {""}))), atividades=("Atividade", lambda x: "; ".join(sorted(set(x.dropna())))),
@@ -54,7 +68,7 @@ p = pd.concat([c[cols], s[cols + ["validade"]]], ignore_index=True).rename(colum
 p["id_local"] = [local(ci, uf) if str(pa).upper().startswith("BRA") else "" for ci, uf, pa in zip(p.cidade, p.uf, p.pais)]
 br = p.pais.str.upper().str.startswith("BRA")
 p = p.merge(mun[["id_local", "cod_ibge", "regiao", "bioma_predominante"]], on="id_local", how="left")
-p.to_csv(DADOS + "produtores_organicos.csv", index=False)
+p.to_csv(PRIV + "produtores_organicos.csv", index=False)
 fora = p[br & (p.id_local == "")]
 print("produtores:", p.fonte.value_counts().to_dict(), "| no exterior:", (~br).sum(), "| BR sem município:", len(fora))
 print(fora.groupby(["cidade", "uf"]).size().sort_values(ascending=False).head(25).to_string())

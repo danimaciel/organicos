@@ -1,17 +1,21 @@
 """Cruza os produtos declarados pelos produtores orgânicos (CNPO/SIGORG) com os conteúdos da Embrapa
 que tratam de cada produto: todos os conteúdos e só os de orgânicos/agroecologia."""
 import json, re, unicodedata, pandas as pd
-SRC, R, D = "/mnt/project-files/Orgânicos/", "/mnt/project-files/embrapa-organicos/referencias/", "/mnt/project-files/embrapa-organicos/dados/"
+import os
+_B = os.environ.get("ORG_BASE", "/mnt/project-files/embrapa-organicos/").rstrip("/") + "/"
+_SRC = os.environ.get("ORG_SRC", "/mnt/project-files/Orgânicos/").rstrip("/") + "/"
+SRC, R, D = _SRC, _B + "referencias/", _B + "dados/"
+PRIV = os.environ.get("ORG_PRIVADO", D).rstrip("/") + "/"
 def norm(s): return re.sub(r"[\s\-_/]+", " ", unicodedata.normalize("NFKD", str(s)).encode("ascii", "ignore").decode().lower())
 PR = json.load(open(R + "produtos.json"))["produtos"]
 rx_p = [re.compile(p["prod"]) for p in PR]
 rx_c = [re.compile(p["ciencia"]) for p in PR]
 
 # produtores
-pr = pd.read_csv(D + "produtores_organicos.csv", dtype=str)
+pr = pd.read_csv(PRIV + "produtores_organicos.csv", dtype=str)
 pr["a"] = (pr.atividades.fillna("") + " " + pr.escopo.fillna("")).map(norm)
 pr["produtos"] = [";".join(str(k) for k, r in enumerate(rx_p) if r.search(a)) for a in pr.a]
-pr.drop(columns="a").to_csv(D + "produtores_organicos.csv", index=False)
+pr.drop(columns="a").to_csv(PRIV + "produtores_organicos.csv", index=False)
 br = pr[pr.id_local.notna()]
 
 # conteúdos (todos os da Embrapa) — marca produtos
@@ -19,18 +23,23 @@ fontes = [("P", "publicacoes-da-embrapa-2026-09.csv", ["Título", "Palavras-chav
           ("J", "projetos-da-embrapa-2026-09.csv", ["Título", "Palavras-chave", "Resumo"]),
           ("S", "solucoes-tecnologicas-da-embrapa-2026-09.csv", ["Nome", "Palavras-chave", "Descrição"])]
 linhas = []
+if not all(os.path.exists(SRC + f) for _, f, _ in fontes):  # sem as bases da Embrapa: reaproveita a marcação já feita
+    print("bases da Embrapa ausentes: usando dados/conteudo_produto.csv existente"); fontes = []
 for t, f, campos in fontes:
     df = pd.read_csv(SRC + f, dtype=str, usecols=["ID"] + campos)
     for i, txt in zip(df.ID, df[campos].fillna("").agg(" | ".join, axis=1)):
         x = norm(txt)
         for k, r in enumerate(rx_c):
             if r.search(x): linhas.append((t, i, k))
-cp = pd.DataFrame(linhas, columns=["tipo", "id", "produto"])
+cp = pd.DataFrame(linhas, columns=["tipo", "id", "produto"]) if fontes else None
 org = pd.concat([pd.read_csv(D + f"{n}_classificados.csv", dtype=str, usecols=["ID", "nivel"]).assign(tipo=t)
                  for t, n in [("P", "publicacoes"), ("J", "projetos"), ("S", "solucoes")]]).rename(columns={"ID": "id"})
-cp = cp.merge(org, on=["tipo", "id"], how="left")
-cp["nivel"] = cp.nivel.fillna("Outro")
-cp.to_csv(D + "conteudo_produto.csv", index=False)
+if cp is None:
+    cp = pd.read_csv(D + "conteudo_produto.csv", dtype={"tipo": str, "id": str, "nivel": str})
+else:
+    cp = cp.merge(org, on=["tipo", "id"], how="left")
+    cp["nivel"] = cp.nivel.fillna("Outro")
+    cp.to_csv(D + "conteudo_produto.csv", index=False)
 
 # resumo produção x ciência
 tot = len(br)
