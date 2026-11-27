@@ -126,4 +126,9 @@ def resumir():
 
 
 if __name__ == "__main__":
-    {"baixar": baixar, "resumir": resumir}[sys.argv[1]]()
+    try:
+        {"baixar": baixar, "resumir": resumir}[sys.argv[1]]()
+    except SystemExit:
+        raise
+    except Exception as e:  # qualquer erro vira aviso em linguagem simples, com o detalhe técnico
+        falha(f"A tarefa parou com um erro ao {'baixar a planilha' if sys.argv[1] == 'baixar' else 'conferir o resultado'}: `{type(e).__name__}: {e}`")

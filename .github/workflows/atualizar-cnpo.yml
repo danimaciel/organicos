@@ -29,15 +29,18 @@ jobs:
   cnpo:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash  # com "pipefail": um erro antes do tee também para a tarefa
     env:
       ORG_BASE: ${{ github.workspace }}
       ORG_SRC: /tmp/origem
       ORG_PRIVADO: /tmp/privado
       GH_TOKEN: ${{ github.token }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
@@ -48,18 +51,19 @@ jobs:
 
       - name: Baixar e conferir a planilha do CNPO
         id: baixar
-        run: python scripts/10_atualizar_cnpo.py baixar
+        run: python scripts/10_atualizar_cnpo.py baixar 2>&1 | tee -a /tmp/registro.txt
 
       - name: Refazer produtores, produtos e pacote do mapa
         if: steps.baixar.outputs.mudou == 'true'
         run: |
-          python scripts/05_produtores.py
-          python scripts/07_produtos.py
-          python scripts/06_pacote_ambiente.py
+          set -o pipefail
+          python scripts/05_produtores.py 2>&1 | tee -a /tmp/registro.txt
+          python scripts/07_produtos.py 2>&1 | tail -5 | tee -a /tmp/registro.txt
+          python scripts/06_pacote_ambiente.py 2>&1 | tee -a /tmp/registro.txt
 
       - name: Conferir e resumir
         if: steps.baixar.outputs.mudou == 'true'
-        run: python scripts/10_atualizar_cnpo.py resumir
+        run: python scripts/10_atualizar_cnpo.py resumir 2>&1 | tee -a /tmp/registro.txt
 
       - name: Mostrar o resumo
         if: always()
@@ -71,7 +75,8 @@ jobs:
         run: |
           { echo "**Teste da tarefa de atualização do CNPO** (nada foi publicado)"; echo;
             if [ -f resumo_cnpo.md ]; then cat resumo_cnpo.md; else echo "A planilha é igual à última usada: nada a atualizar."; fi;
-            echo; echo "Arquivos que mudariam:"; echo '```'; git status --short; echo '```'; } > comentario.md
+            echo; echo "Arquivos que mudariam:"; echo '```'; git status --short; echo '```';
+            echo; echo "<details><summary>Registro</summary>"; echo; echo '```'; tail -40 /tmp/registro.txt 2>/dev/null; echo '```'; echo "</details>"; } > comentario.md
           gh pr comment "${{ github.event.pull_request.number }}" --body-file comentario.md
 
       # modo normal: abre o pedido de mudança com os dados novos
@@ -96,5 +101,6 @@ jobs:
         if: failure() && github.event_name != 'pull_request'
         run: |
           { if [ -f resumo_cnpo.md ]; then cat resumo_cnpo.md; else echo "A tarefa parou antes de terminar."; fi;
+            echo; echo '```'; tail -20 /tmp/registro.txt 2>/dev/null; echo '```';
             echo; echo "Detalhes: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"; } > aviso.md
           gh issue create --title "Atualização do CNPO não foi feita" --body-file aviso.md --assignee "${{ github.repository_owner }}"
