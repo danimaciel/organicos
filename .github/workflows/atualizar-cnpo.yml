@@ -49,6 +49,15 @@ jobs:
       - name: Instalar bibliotecas
         run: pip install -r scripts/requirements.txt
 
+      - name: Diagnóstico de rede (só no teste)
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        run: |
+          for u in https://www.gov.br/ https://www.gov.br/agricultura/pt-br https://dados.agricultura.gov.br/ https://example.com/; do
+            echo "$u -> $(curl -s -o /dev/null -m 30 -w '%{http_code} %{remote_ip}' "$u" 2>&1 || echo falhou)" | tee -a /tmp/registro.txt
+          done
+          curl -s -m 10 https://ipinfo.io/country | sed 's/^/país do servidor: /' | tee -a /tmp/registro.txt || true
+
       - name: Baixar e conferir a planilha do CNPO
         id: baixar
         run: python scripts/10_atualizar_cnpo.py baixar 2>&1 | tee -a /tmp/registro.txt
